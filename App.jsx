@@ -1,4 +1,28 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+
+const SUPABASE_URL = "https://xmiygmcczqlvovdwlfov.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXlnbWNjenFsdm92ZHdsZm92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjQwOTIsImV4cCI6MjA5NDM0MDA5Mn0._Fp6Ah-pg2Kp9qbemzNZJ7RQj6w34WJRZsWNvVDtYJA";
+
+async function sbFetch(table, method="GET", body=null, filters="") {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filters}`, {
+    method,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": method==="POST"?"return=representation":"",
+    },
+    body: body ? JSON.stringify(body) : null,
+  });
+  if (!res.ok) return null;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function sbSelect(table) { return await sbFetch(table, "GET", null, "?select=*&order=id"); }
+async function sbUpsert(table, data) { return await sbFetch(table, "POST", data, "?on_conflict=id"); }
+async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
+
 
 const CATEGORIAS = ["Padrillo", "Yegua madre", "Potro", "Potranca", "Castrado", "Yegua de trabajo"];
 const ALIMENTOS  = ["Heno de alfalfa","Heno de pastura","Grano de maíz","Avena","Pellet comercial","Suplemento proteico","Sal mineral"];
@@ -300,6 +324,66 @@ export default function HarasApp(){
   const [lotes,setLotes]=useState(initLotes);
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
+  const [loading,setLoading]=useState(false);
+  const [dbConnected,setDbConnected]=useState(false);
+
+  // Load from Supabase on mount
+  useEffect(()=>{
+    async function loadData(){
+      setLoading(true);
+      try {
+        const [lotesDb, caballosDb] = await Promise.all([sbSelect("lotes"), sbSelect("caballos")]);
+        if(lotesDb && lotesDb.length > 0){
+          // Merge DB lotes with initLotes to keep local fields like intervenciones/lluvias
+          setLotes(prev => prev.map(l => {
+            const db = lotesDb.find(x => x.id === l.id);
+            if(!db) return l;
+            return { ...l,
+              ultimaDesmalezada: db.ultima_desmalezada || l.ultimaDesmalezada,
+              notas: db.notas || l.notas,
+              ultimaSiembra: db.ultima_siembra || l.ultimaSiembra,
+              queSembro: db.que_sembro || l.queSembro,
+              fechaVacio: db.fecha_vacio || l.fechaVacio,
+              tieneRiego: db.tiene_riego ?? l.tieneRiego,
+              riegoDiario: db.riego_diario ?? l.riegoDiario,
+              hectareas: db.hectareas ?? l.hectareas,
+            };
+          }));
+          setDbConnected(true);
+        }
+        if(caballosDb && caballosDb.length > 0){
+          setCaballos(caballosDb.map(c=>({
+            id: c.id, nombre: c.nombre, categoria: c.categoria,
+            alimentos: c.alimentos || [], loteId: c.lote_id,
+            fechaIngreso: c.fecha_ingreso || "", peso: c.peso || "",
+            color: c.color || "",
+          })));
+        }
+      } catch(e) { console.log("DB not available, using local data"); }
+      setLoading(false);
+    }
+    loadData();
+  },[]);
+
+  // Save lote to Supabase
+  async function saveLoteToDb(lote){
+    await sbUpsert("lotes", [{
+      id: lote.id, nombre: lote.nombre, hectareas: lote.hectareas||null,
+      ultima_desmalezada: lote.ultimaDesmalezada||null,
+      notas: lote.notas||null, ultima_siembra: lote.ultimaSiembra||null,
+      que_sembro: lote.queSembro||null, fecha_vacio: lote.fechaVacio||null,
+      tiene_riego: lote.tieneRiego, riego_diario: lote.riegoDiario||0,
+    }]);
+  }
+
+  // Save caballo to Supabase
+  async function saveCaballoToDb(c){
+    await sbUpsert("caballos", [{
+      id: c.id, nombre: c.nombre, categoria: c.categoria,
+      alimentos: c.alimentos, lote_id: c.loteId,
+      fecha_ingreso: c.fechaIngreso||null, peso: c.peso||null, color: c.color||null,
+    }]);
+  }
   const [selLote,setSelLote]=useState(null);
   const [modal,setModal]=useState(null);
   const [editId,setEditId]=useState(null);
@@ -361,23 +445,36 @@ export default function HarasApp(){
 
   function saveCab(){
     if(!fC.nombre||!fC.loteId)return;
-    if(editId) setCaballos(p=>p.map(c=>c.id===editId?{...c,...fC}:c));
-    else setCaballos(p=>[...p,{...fC,id:"C"+Date.now()}]);
+    const newC = editId ? {...caballos.find(c=>c.id===editId),...fC} : {...fC,id:"C"+Date.now()};
+    if(editId) setCaballos(p=>p.map(c=>c.id===editId?newC:c));
+    else setCaballos(p=>[...p,newC]);
+    saveCaballoToDb(newC);
     closeModal();
   }
-  function delCab(id){setCaballos(p=>p.filter(c=>c.id!==id));}
+  function delCab(id){setCaballos(p=>p.filter(c=>c.id!==id)); sbDelete("caballos",id);}
   function editCab(c){setFC({nombre:c.nombre,categoria:c.categoria,alimentos:[...c.alimentos],loteId:c.loteId,peso:c.peso,color:c.color,fechaIngreso:c.fechaIngreso});setEditId(c.id);setModal("cab");}
   function togAlim(a){setFC(f=>({...f,alimentos:f.alimentos.includes(a)?f.alimentos.filter(x=>x!==a):[...f.alimentos,a]}));}
 
   function saveLote(){
     if(!fL.nombre)return;
     const d={...fL,hectareas:parseFloat(fL.hectareas)||0,riegoDiario:parseFloat(fL.riegoDiario)||0};
-    if(editId) setLotes(p=>p.map(x=>x.id===editId?{...x,...d}:x));
-    else setLotes(p=>[...p,{...d,id:"L"+Date.now(),intervenciones:[],lluvias:[]}]);
+    let savedLote;
+    if(editId){
+      setLotes(p=>p.map(x=>{ if(x.id===editId){savedLote={...x,...d};return savedLote;}return x;}));
+    } else {
+      savedLote={...d,id:"L"+Date.now(),intervenciones:[],lluvias:[]};
+      setLotes(p=>[...p,savedLote]);
+    }
+    setTimeout(()=>{ if(savedLote) saveLoteToDb(savedLote); },0);
     closeModal();
   }
   function editLote(l){setFL({nombre:l.nombre,hectareas:l.hectareas,ultimaDesmalezada:l.ultimaDesmalezada||"",notas:l.notas||"",ultimaSiembra:l.ultimaSiembra||"",queSembro:l.queSembro||"",fechaVacio:l.fechaVacio||"",tieneRiego:!!l.tieneRiego,riegoDiario:l.riegoDiario||""});setEditId(l.id);setModal("lote");}
-  function desmHoy(lid){setLotes(p=>p.map(x=>x.id===lid?{...x,ultimaDesmalezada:hoy()}:x));}
+  function desmHoy(lid){
+    setLotes(p=>p.map(x=>{
+      if(x.id===lid){ const updated={...x,ultimaDesmalezada:hoy()}; saveLoteToDb(updated); return updated; }
+      return x;
+    }));
+  }
 
   function saveInterv(){
     if(!fI.elemento||!intervPid)return;
@@ -418,7 +515,10 @@ export default function HarasApp(){
           </div>
           <div className="nsec" style={{marginTop:"auto",borderTop:"1px solid var(--bb)",paddingTop:16}}>
             <div className="nlbl">Resumen</div>
-            <div style={{padding:"8px 12px",fontSize:13,color:"#a89070"}}>
+            <div style={{padding:"8px 12px 4px",fontSize:11,color:dbConnected?"#4caf6e":"#7a6a50"}}>
+            {dbConnected?"● Base de datos conectada":"○ Datos locales"}
+          </div>
+          <div style={{padding:"4px 12px",fontSize:13,color:"#a89070"}}>
               <div style={{marginBottom:4}}><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.totalCabs}</span> con nombre</div>
               <div style={{marginBottom:4}}><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.totalLotes}</span> lotes</div>
               <div><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.haTotal}</span> <span style={{fontSize:12}}>ha</span></div>
