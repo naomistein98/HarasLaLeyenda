@@ -351,6 +351,10 @@ export default function HarasApp(){
           }));
           setDbConnected(true);
         }
+        const desmalezadasDb = await sbSelect("desmalezadas");
+        if(desmalezadasDb && desmalezadasDb.length > 0){
+          setDesmalezadas(desmalezadasDb.map(d=>({id:d.id,loteId:d.lote_id,fecha:d.fecha,notas:d.notas||""})));
+        }
         if(caballosDb && caballosDb.length > 0){
           setCaballos(caballosDb.map(c=>({
             id: c.id, nombre: c.nombre, categoria: c.categoria,
@@ -389,17 +393,21 @@ export default function HarasApp(){
   const [editId,setEditId]=useState(null);
   const [intervPid,setIntervPid]=useState(null);
   const [lluviaPid,setLluviaPid]=useState(null);
+  const [desmPid,setDesmPid]=useState(null);
+  const [desmalezadas,setDesmalezadas]=useState([]);
   const [busqueda,setBusqueda]=useState("");
 
   const EL={nombre:"",hectareas:"",ultimaDesmalezada:"",notas:"",ultimaSiembra:"",queSembro:"",fechaVacio:"",tieneRiego:false,riegoDiario:""};
   const EC={nombre:"",categoria:CATEGORIAS[0],alimentos:[],loteId:"",peso:"",color:"",fechaIngreso:hoy()};
   const EI={fecha:hoy(),tipo:"Intersiembra",elemento:""};
+  const ED={fecha:hoy(),notas:""};
   const ELl={fecha:hoy(),mm:""};
   const ER={caballoId:"",loteOrigen:"",loteDestino:"",fecha:hoy(),motivo:"",diasEnOrigen:""};
 
   const [fL,setFL]=useState(EL);
   const [fC,setFC]=useState(EC);
   const [fI,setFI]=useState(EI);
+  const [fD,setFD]=useState(ED);
   const [fLl,setFLl]=useState(ELl);
   const [fR,setFR]=useState(ER);
 
@@ -441,7 +449,7 @@ export default function HarasApp(){
     cats:CATEGORIAS.reduce((a,c)=>{a[c]=caballos.filter(x=>x.categoria===c).length;return a},{}),
   }),[caballos,lotes]);
 
-  function closeModal(){setModal(null);setEditId(null);setIntervPid(null);setLluviaPid(null);setFL(EL);setFC(EC);setFI(EI);setFLl(ELl);setFR(ER);}
+  function closeModal(){setModal(null);setEditId(null);setIntervPid(null);setLluviaPid(null);setDesmPid(null);setFL(EL);setFC(EC);setFI(EI);setFLl(ELl);setFR(ER);setFD(ED);}
 
   function saveCab(){
     if(!fC.nombre||!fC.loteId)return;
@@ -470,10 +478,30 @@ export default function HarasApp(){
   }
   function editLote(l){setFL({nombre:l.nombre,hectareas:l.hectareas,ultimaDesmalezada:l.ultimaDesmalezada||"",notas:l.notas||"",ultimaSiembra:l.ultimaSiembra||"",queSembro:l.queSembro||"",fechaVacio:l.fechaVacio||"",tieneRiego:!!l.tieneRiego,riegoDiario:l.riegoDiario||""});setEditId(l.id);setModal("lote");}
   function desmHoy(lid){
+    const fecha=hoy();
     setLotes(p=>p.map(x=>{
-      if(x.id===lid){ const updated={...x,ultimaDesmalezada:hoy()}; saveLoteToDb(updated); return updated; }
+      if(x.id===lid){ const updated={...x,ultimaDesmalezada:fecha}; saveLoteToDb(updated); return updated; }
       return x;
     }));
+    const newD={id:"D"+Date.now(),loteId:lid,fecha,notas:""};
+    setDesmalezadas(p=>[...p,newD]);
+    sbUpsert("desmalezadas",[{id:newD.id,lote_id:lid,fecha,notas:""}]);
+  }
+
+  function saveDesm(){
+    if(!desmPid)return;
+    const newD={id:"D"+Date.now(),loteId:desmPid,fecha:fD.fecha,notas:fD.notas};
+    setDesmalezadas(p=>[...p,newD]);
+    setLotes(p=>p.map(x=>{
+      if(x.id===desmPid){ const updated={...x,ultimaDesmalezada:fD.fecha}; saveLoteToDb(updated); return updated; }
+      return x;
+    }));
+    sbUpsert("desmalezadas",[{id:newD.id,lote_id:desmPid,fecha:fD.fecha,notas:fD.notas||null}]);
+    closeModal();
+  }
+  function delDesm(id){
+    setDesmalezadas(p=>p.filter(d=>d.id!==id));
+    sbDelete("desmalezadas",id);
   }
 
   function saveInterv(){
@@ -632,7 +660,7 @@ export default function HarasApp(){
                     <button className="btn bg sm" onClick={()=>editLote(l)}>Editar</button>
                     <button className="btn bg sm" onClick={()=>{setIntervPid(l.id);setFI(EI);setModal("interv");}}>+ Intervención</button>
                     <button className="btn bg sm" onClick={()=>{setLluviaPid(l.id);setFLl(ELl);setModal("lluvia");}}>+ Lluvia</button>
-                    <button className="btn bp sm" onClick={()=>desmHoy(l.id)}>Registrar desmalezada hoy</button>
+                    <button className="btn bp sm" onClick={()=>{setDesmPid(l.id);setFD({...ED,fecha:hoy()});setModal("desm");}}>+ Desmalezada</button>
                   </div>
                 </div>
                 <div className="cnt">
@@ -731,6 +759,32 @@ export default function HarasApp(){
                     </div>
                   </div>
 
+                  {/* Historial de Desmalezadas */}
+                  {(()=>{
+                    const desmDeLote=[...desmalezadas.filter(d=>d.loteId===l.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                    return(
+                      <div className="card" style={{marginBottom:20}}>
+                        <div className="fbt mb3">
+                          <div className="stit" style={{marginBottom:0}}>Historial de desmalezadas</div>
+                          <button className="btn bg sm" onClick={()=>{setDesmPid(l.id);setFD({...ED,fecha:hoy()});setModal("desm");}}>+ Registrar</button>
+                        </div>
+                        {desmDeLote.length===0
+                          ?<div className="tm txs">Sin registros — usá el botón para agregar</div>
+                          :<table className="table">
+                            <thead><tr><th>Fecha</th><th>Días atrás</th><th>Notas</th><th></th></tr></thead>
+                            <tbody>{desmDeLote.map((d,i)=>(
+                              <tr key={d.id}>
+                                <td>{fmt(d.fecha)}</td>
+                                <td className="tg" style={{fontWeight:500}}>{diasDesde(d.fecha)} días</td>
+                                <td className="tm">{d.notas||"—"}</td>
+                                <td>{i>0&&<button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>delDesm(d.id)}>✕</button>}</td>
+                              </tr>
+                            ))}</tbody>
+                          </table>
+                        }
+                      </div>
+                    );
+                  })()}
                   {/* Historial de Siembras */}
                   {SIEMBRAS[l.id]&&(
                     <div className="card" style={{marginBottom:20}}>
@@ -967,6 +1021,20 @@ export default function HarasApp(){
           </div>
         )}
 
+        {/* MODAL: Desmalezada */}
+        {modal==="desm"&&(
+          <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
+            <div className="md" style={{maxWidth:420}}>
+              <div className="mtit">Registrar desmalezada</div>
+              <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={fD.fecha} onChange={e=>setFD(f=>({...f,fecha:e.target.value}))}/></div>
+              <div className="fg"><label className="fl">Notas (opcional)</label><input className="fi" value={fD.notas} onChange={e=>setFD(f=>({...f,notas:e.target.value}))} placeholder="Ej: Solo mitad del lote"/></div>
+              <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
+                <button className="btn bg" onClick={closeModal}>Cancelar</button>
+                <button className="btn bp" onClick={saveDesm}>Registrar</button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* MODAL: Rotación */}
         {modal==="rot"&&(
           <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
