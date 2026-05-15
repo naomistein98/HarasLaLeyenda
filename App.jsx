@@ -448,6 +448,7 @@ export default function HarasApp(){
 
   const stats=useMemo(()=>({
     totalCabs:caballos.length,
+    totalAnimales:lotes.reduce((sum,l)=>sum+stockTotal(l.id),0),
     totalLotes:lotes.length,
     ocup:lotes.filter(l=>stockTotal(l.id)>0).length,
     haTotal:lotes.reduce((s,l)=>s+(l.hectareas||0),0).toFixed(1),
@@ -554,7 +555,7 @@ export default function HarasApp(){
             {dbConnected?"● Base de datos conectada":"○ Datos locales"}
           </div>
           <div style={{padding:"4px 12px",fontSize:13,color:"#a89070"}}>
-              <div style={{marginBottom:4}}><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.totalCabs}</span> con nombre</div>
+              <div style={{marginBottom:4}}><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.totalAnimales}</span> animales</div>
               <div style={{marginBottom:4}}><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.totalLotes}</span> lotes</div>
               <div><span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:20}}>{stats.haTotal}</span> <span style={{fontSize:12}}>ha</span></div>
             </div>
@@ -569,7 +570,7 @@ export default function HarasApp(){
               <div className="mh"><div><h2>Panel general</h2><p>Vista consolidada del haras</p></div></div>
               <div className="cnt">
                 <div className="g3 mb4" style={{marginBottom:20}}>
-                  {[{v:stats.totalCabs,l:"Caballos con nombre"},{v:stats.totalLotes,l:"Lotes totales"},{v:`${stats.haTotal} ha`,l:"Superficie total"}].map((s,i)=>(
+                  {[{v:stats.totalAnimales,l:"Animales en campo"},{v:stats.totalLotes,l:"Lotes totales"},{v:`${stats.haTotal} ha`,l:"Superficie total"}].map((s,i)=>(
                     <div key={i} className="card"><div className="sv">{s.v}</div><div className="sl">{s.l}</div></div>
                   ))}
                 </div>
