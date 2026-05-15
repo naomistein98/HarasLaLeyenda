@@ -236,7 +236,8 @@ const css=`
 body{font-family:'DM Sans',sans-serif;background:#1a1410;color:#e8dcc8;min-height:100vh}
 :root{--gold:#c8973a;--goldl:#e8b85a;--cream:#e8dcc8;--bd:#1a1410;--bm:#2d2318;--bc:#251c12;--bb:#3d2e1a}
 .app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:240px;flex-shrink:0;background:var(--bm);border-right:1px solid var(--bb);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar{width:240px;flex-shrink:0;background:var(--bm);border-right:1px solid var(--bb);display:flex;flex-direction:column;overflow-y:auto;transition:transform .25s}
+@media(max-width:700px){.sidebar{position:fixed;top:0;left:0;height:100vh;z-index:200;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:flex!important}}
 .slogo{padding:24px 20px 20px;border-bottom:1px solid var(--bb)}
 .slogo h1{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);line-height:1.2}
 .slogo p{font-size:11px;color:#7a6a50;margin-top:3px;letter-spacing:2px;text-transform:uppercase}
@@ -316,11 +317,15 @@ body{font-family:'DM Sans',sans-serif;background:#1a1410;color:#e8dcc8;min-heigh
 .li{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(61,46,26,.4);font-size:13px}
 .li:last-child{border-bottom:none}
 .search-input{width:100%;padding:9px 14px;border-radius:8px;background:var(--bm);border:1px solid var(--bb);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:16px}
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:300;background:var(--bm);border:1px solid var(--bb);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--gold);font-size:18px;line-height:1}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}
+@media(max-width:700px){.overlay.open{display:block}.main{width:100%}}
 .search-input:focus{border-color:var(--gold)}
 `;
 
 export default function HarasApp(){
   const [view,setView]=useState("dashboard");
+  const [sidebarOpen,setSidebarOpen]=useState(false);
   const [lotes,setLotes]=useState(initLotes);
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
@@ -531,12 +536,14 @@ export default function HarasApp(){
     <>
       <style>{css}</style>
       <div className="app">
-        <aside className="sidebar">
+        <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>☰</button>
+        <div className={`overlay ${sidebarOpen?"open":""}`} onClick={()=>setSidebarOpen(false)}/>
+        <aside className={`sidebar ${sidebarOpen?"open":""}`}>
           <div className="slogo"><h1>Haras<br/>Manager</h1><p>Sistema de gestión</p></div>
           <div className="nsec">
             <div className="nlbl">Menú</div>
             {nav.map(n=>(
-              <button key={n.id} className={`ni ${view===n.id?"active":""}`} onClick={()=>{setView(n.id);setSelLote(null);setBusqueda("");}}>
+              <button key={n.id} className={`ni ${view===n.id?"active":""}`} onClick={()=>{setView(n.id);setSelLote(null);setBusqueda("");setSidebarOpen(false);}}>
                 <span className="ic">{n.ic}</span>{n.lb}
               </button>
             ))}
