@@ -236,7 +236,7 @@ const css=`
 body{font-family:'DM Sans',sans-serif;background:#f5f5f0;color:#111111;min-height:100vh;font-weight:500}
 :root{--gold:#b07d2a;--goldl:#c8973a;--cream:#1a1410;--bd:#f5f5f0;--bm:#ffffff;--bc:#ffffff;--bb:#e0ddd8}
 .app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:240px;flex-shrink:0;background:var(--bm);border-right:1px solid var(--bb);display:flex;flex-direction:column;overflow-y:auto;transition:transform .25s}
+.sidebar{width:260px;flex-shrink:0;background:#ffffff;border-right:1px solid #e0ddd8;display:flex;flex-direction:column;overflow-y:auto;position:fixed;top:0;left:0;height:100vh;z-index:200;transition:transform .3s ease;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
 
 .slogo{padding:24px 20px 20px;border-bottom:1px solid var(--bb)}
 .slogo h1{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);line-height:1.2}
@@ -317,8 +317,8 @@ body{font-family:'DM Sans',sans-serif;background:#f5f5f0;color:#111111;min-heigh
 .li{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(61,46,26,.4);font-size:13px}
 .li:last-child{border-bottom:none}
 .search-input{width:100%;padding:9px 14px;border-radius:8px;background:#f9f9f7;border:1px solid #e0ddd8;color:#1a1410;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;margin-bottom:16px}
-.hamburger{display:flex;align-items:center;justify-content:center;position:fixed;top:14px;left:14px;z-index:300;background:#ffffff;border:1px solid #e0ddd8;border-radius:8px;padding:8px 12px;cursor:pointer;color:#8B6000;font-size:22px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.12);font-weight:700}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}.overlay.open{display:block}
+.hamburger{display:flex;align-items:center;justify-content:center;position:fixed;top:12px;left:12px;z-index:201;background:#ffffff;border:1px solid #e0ddd8;border-radius:8px;width:40px;height:40px;cursor:pointer;color:#8B6000;font-size:20px;box-shadow:0 2px 6px rgba(0,0,0,.12);font-weight:700}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;cursor:pointer}.overlay.open{display:block}
 .search-input:focus{border-color:var(--gold)}
 `;
 
@@ -536,7 +536,7 @@ export default function HarasApp(){
     <>
       <style>{css}</style>
       <div className="app">
-        <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>☰</button>
+        <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button>
         <div className={`overlay ${sidebarOpen?"open":""}`} onClick={()=>setSidebarOpen(false)}/>
         <aside className={`sidebar ${sidebarOpen?"open":""}`}>
           <div className="slogo"><h1>Haras<br/>Manager</h1><p>Sistema de gestión</p></div>
@@ -566,7 +566,7 @@ export default function HarasApp(){
           {/* DASHBOARD */}
           {view==="dashboard"&&(
             <>
-              <div className="mh"><div><h2>Panel general</h2><p>Vista consolidada del haras</p></div></div>
+              <div className="mh"><button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button><div><h2>Panel general</h2><p>Vista consolidada del haras</p></div></div>
               <div className="cnt">
                 <div className="g3 mb4" style={{marginBottom:20}}>
                   {[{v:stats.totalAnimales,l:"Animales en campo"},{v:stats.totalLotes,l:"Lotes totales"},{v:`${stats.haTotal} ha`,l:"Superficie total"}].map((s,i)=>(
@@ -610,7 +610,7 @@ export default function HarasApp(){
           {view==="lotes"&&!selLote&&(
             <>
               <div className="mh">
-                <div><h2>Lotes</h2><p>{lotes.length} lotes · {stats.haTotal} ha totales</p></div>
+                <div style={{marginLeft:52}}><h2>Lotes</h2><p>{lotes.length} lotes · {stats.haTotal} ha totales</p></div>
                 <button className="btn bp" onClick={()=>{setEditId(null);setFL(EL);setModal("lote");}}>+ Nuevo lote</button>
               </div>
               <div className="cnt">
@@ -863,7 +863,7 @@ export default function HarasApp(){
           {view==="caballos"&&(
             <>
               <div className="mh">
-                <div><h2>Caballos</h2><p>{caballos.length} registros con nombre</p></div>
+                <div style={{marginLeft:52}}><h2>Caballos</h2><p>{caballos.length} registros con nombre</p></div>
                 <button className="btn bp" onClick={()=>{setEditId(null);setFC(EC);setModal("cab");}}>+ Nuevo caballo</button>
               </div>
               <div className="cnt">
@@ -903,7 +903,7 @@ export default function HarasApp(){
           {view==="rotaciones"&&(
             <>
               <div className="mh">
-                <div><h2>Rotación de cultivos</h2><p>Historial de siembras por lote</p></div>
+                <div style={{marginLeft:52}}><h2>Rotación de cultivos</h2><p>Historial de siembras por lote</p></div>
                 
               </div>
               <div className="cnt">
