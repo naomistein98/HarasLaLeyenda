@@ -27,6 +27,43 @@ async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null,
 const CATEGORIAS = ["Padrillo", "Yegua madre", "Potro", "Potranca", "Castrado", "Yegua de trabajo"];
 const ALIMENTOS  = ["Heno de alfalfa","Heno de pastura","Grano de maíz","Avena","Pellet comercial","Suplemento proteico","Sal mineral"];
 
+// Tasas de crecimiento kg MS / ha / día por cultivo y mes
+const TASAS_CRECIMIENTO = {
+  // cultivo keyword → {mes(1-12): tasa}
+  "pastura":  {1:10,2:12,3:14,4:13,5:12,6:7,7:6,8:8,9:10,10:12,11:13,12:11},
+  "avena":    {1:10,2:12,3:14,4:18,5:22,6:14,7:0,8:0,9:0,10:12,11:18,12:14},
+  "raygrass": {1:8,2:10,3:12,4:14,5:15,6:10,7:8,8:8,9:10,10:12,11:13,12:10},
+  "rye grass":{1:8,2:10,3:12,4:14,5:15,6:10,7:8,8:8,9:10,10:12,11:13,12:10},
+  "moha":     {1:0,2:0,3:0,4:0,5:0,6:0,7:15,8:20,9:18,10:10,11:0,12:0},
+  "natural":  {1:8,2:10,3:11,4:12,5:11,6:6,7:5,8:6,9:9,10:11,11:12,12:10},
+};
+
+function getTasaCrecimiento(cultivo, mes){
+  if(!cultivo) return null;
+  const c = cultivo.toLowerCase();
+  for(const key of Object.keys(TASAS_CRECIMIENTO)){
+    if(c.includes(key)) return TASAS_CRECIMIENTO[key][mes] || null;
+  }
+  return null;
+}
+
+function getDisponibilidadDiaria(lote){
+  // Get current cultivo from SIEMBRAS (last period)
+  const siembras = SIEMBRAS[lote.id];
+  if(!siembras || !siembras.length) return null;
+  const cultivo = siembras[siembras.length-1].c;
+  if(!cultivo || cultivo==="Sin dato") return null;
+  const mes = new Date().getMonth()+1;
+  const tasa = getTasaCrecimiento(cultivo, mes);
+  if(!tasa || !lote.hectareas) return null;
+  return {
+    kgDia: Math.round(tasa * lote.hectareas),
+    tasa,
+    cultivo,
+    hectareas: lote.hectareas,
+  };
+}
+
 const PASTURA_COMP = {
   "Pastura Politictica": ["Cebadilla","Pasto ovillo","Rye Grass perenne","Rye Grass anual","Phalaris","Trebol rojo","Trebol blanco","Alfalfa","Lotus corniculatus","Achicoria"],
 };
@@ -774,7 +811,7 @@ export default function HarasApp(){
                     <button className="btn bg sm" onClick={()=>navigate("lotes",null)}>Ver todos →</button>
                   </div>
                   <table className="table">
-                    <thead><tr><th>Lote</th><th>Ha</th><th>Animales</th><th>Pastoreando</th><th>Descanso</th><th>Últ. desmalezada</th><th>Pastura</th></tr></thead>
+                    <thead><tr><th>Lote</th><th>Ha</th><th>Animales</th><th>Pastoreando</th><th>Descanso</th><th>Últ. desmalezada</th><th>Pastura</th><th>Disponib. diaria</th></tr></thead>
                     <tbody>
                       {lotes.map(l=>{
                         const n=stockTotal(l.id);
@@ -832,6 +869,7 @@ export default function HarasApp(){
                         {dp!==null&&n>0&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Pastoreando</span><span className="iv tg">{dp}d</span></div>}
                         {dd!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Descanso</span><span className="iv" style={{color:"#4caf6e"}}>{dd}d</span></div>}
                         <div className="ir" style={{padding:"6px 0"}}><span className="ik">Desmalezada</span><span className="iv">{fmt(l.ultimaDesmalezada)}</span></div>
+                        {(()=>{const d=getDisponibilidadDiaria(l);return d?<div className="ir" style={{padding:"6px 0"}}><span className="ik">Disponib. diaria</span><span className="iv" style={{color:"#2d5a00",fontWeight:700}}>{d.kgDia} kg MS/d</span></div>:null;})()}
                         {l.notas&&<div className="mt2 txs tm">{l.notas}</div>}
                       </div>
                     );
@@ -899,6 +937,21 @@ export default function HarasApp(){
                       <div className="ir"><span className="ik">Superficie</span><span className="iv">{l.hectareas?`${l.hectareas} ha`:"—"}</span></div>
                       <div className="ir"><span className="ik">Presión de pastoreo</span><span className="iv">{pres?`${pres} cab/ha`:"—"}</span></div>
                       {pres&&<div className="mt2 txs" style={{color:"#a89070"}}>{parseFloat(pres)>1.5?"⚠️ Presión alta — considerar rotar":parseFloat(pres)>0.8?"✓ Presión moderada":"✓ Presión baja"}</div>}
+                      {(()=>{
+                        const disp=getDisponibilidadDiaria(l);
+                        if(!disp) return null;
+                        return(
+                          <div style={{marginTop:14,padding:"12px 14px",borderRadius:8,background:"#f0f8e8",border:"1px solid #c8e8a0"}}>
+                            <div style={{fontSize:11,color:"#446600",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:6}}>📊 Disponibilidad forrajera</div>
+                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                              <div>
+                                <div style={{fontFamily:"Playfair Display,serif",fontSize:26,color:"#2d5a00",fontWeight:700}}>{disp.kgDia} <span style={{fontSize:13}}>kg MS/día</span></div>
+                                <div style={{fontSize:12,color:"#557700",marginTop:2}}>{disp.tasa} kg/ha/día × {disp.hectareas} ha · {disp.cultivo}</div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     <div className="card">
