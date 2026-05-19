@@ -493,6 +493,49 @@ export default function HarasApp(){
     }
     return cabsDe(lid).length;
   };
+  // Determine lote status: "pastoreando" | "creciendo" | "descanso" | "vacio"
+  const getLoteEstado=(lid)=>{
+    const n=stockTotal(lid);
+    if(n>0) return {estado:"pastoreando", label:"Pastoreando", color:"#2d7a2d", bg:"#e8f5e8"};
+    // Lote is empty — check if there's a recent siembra with no animals after
+    const hist=STOCK_HISTORIAL[lid];
+    const siembra=SIEMBRAS[lid];
+    const ultimaSiembraP = siembra ? siembra[siembra.length-1] : null;
+    // Check if there was a siembra more recent than last animal exit
+    if(ultimaSiembraP && ultimaSiembraP.c!=="Sin dato"){
+      // Get date of last animal movement (if any)
+      const lastAnimal=hist?[...hist].filter(x=>x.tot!==undefined).sort((a,b)=>b.f.localeCompare(a.f))[0]:null;
+      // Map periodo to approximate date for comparison
+      const periodoFechas={"Mar 2025":"2025-03-01","Sept 2025":"2025-09-01","Dic 2025":"2025-12-01","Mar 2026":"2026-03-01"};
+      const fechaSiembra=periodoFechas[ultimaSiembraP.p];
+      if(fechaSiembra && (!lastAnimal || fechaSiembra>lastAnimal.f)){
+        return {estado:"creciendo", label:"Creciendo", color:"#5a8a00", bg:"#f0f8e0"};
+      }
+    }
+    // If there was animal activity but now empty → descanso
+    if(hist && hist.some(x=>x.ent>0)){
+      return {estado:"descanso", label:"En descanso", color:"#8B6000", bg:"#fff8e0"};
+    }
+    return {estado:"vacio", label:"Sin actividad", color:"#888", bg:"#f5f5f5"};
+  };
+
+  // Get the date when a lote became empty based on STOCK_HISTORIAL
+  const getFechaVacio=(lid)=>{
+    const hist=STOCK_HISTORIAL[lid];
+    if(!hist||!hist.length) return null;
+    const sorted=[...hist].sort((a,b)=>a.f.localeCompare(b.f));
+    // Find the last entry where tot===0 AND there's no subsequent entry with tot>0
+    let fechaVacio=null;
+    for(let i=0;i<sorted.length;i++){
+      if(sorted[i].tot===0){
+        // Check if any later entry has tot>0
+        const hasLater=sorted.slice(i+1).some(x=>x.tot>0);
+        if(!hasLater) fechaVacio=sorted[i].f;
+      }
+    }
+    return fechaVacio;
+  };
+
   const stockUltimaFecha=(lid)=>{
     const hist=STOCK_HISTORIAL[lid];
     if(!hist||!hist.length) return null;
@@ -736,9 +779,10 @@ export default function HarasApp(){
                       {lotes.map(l=>{
                         const n=stockTotal(l.id);
                         const est=estadoPastura(diasDesde(l.ultimaDesmalezada));
+            const loteEst=getLoteEstado(l.id);
                         const fp=primerIngreso(l.id);
                         const dp=fp?diasDesde(fp):null;
-                        const dd=l.fechaVacio&&n===0?diasDesde(l.fechaVacio):null;
+                        const _fv=getFechaVacio(l.id)||l.fechaVacio; const dd=_fv&&n===0?diasDesde(_fv):null;
                         return(
                           <tr key={l.id} style={{cursor:"pointer"}} onClick={()=>navigate("lotes",l.id)}>
                             <td><button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:600,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",l.id)}>{l.nombre}</button></td>
@@ -747,7 +791,9 @@ export default function HarasApp(){
                             <td>{n>0&&dp!==null?<span className="tg">{dp}d</span>:<span className="tm">—</span>}</td>
                             <td>{n===0&&dd!==null?<span style={{color:"#4caf6e"}}>{dd}d</span>:<span className="tm">—</span>}</td>
                             <td>{fmt(l.ultimaDesmalezada)}</td>
-                            <td><span className="badge" style={{background:`${est.color}20`,color:est.color,borderColor:`${est.color}40`}}>{est.label}</span></td>
+                            <td>
+                              <span className="badge" style={{background:getLoteEstado(l.id).bg,color:getLoteEstado(l.id).color,borderColor:`${getLoteEstado(l.id).color}40`}}>{getLoteEstado(l.id).label}</span>
+                            </td>
                           </tr>
                         );
                       })}
@@ -771,14 +817,16 @@ export default function HarasApp(){
                   {lotesFiltrados.map(l=>{
                     const n=stockTotal(l.id);
                     const est=estadoPastura(diasDesde(l.ultimaDesmalezada));
+            const loteEst=getLoteEstado(l.id);
                     const fp=primerIngreso(l.id);
                     const dp=fp?diasDesde(fp):null;
-                    const dd=l.fechaVacio&&n===0?diasDesde(l.fechaVacio):null;
+                    const _fv=getFechaVacio(l.id)||l.fechaVacio; const dd=_fv&&n===0?diasDesde(_fv):null;
+                    const lEst=getLoteEstado(l.id);
                     return(
-                      <div key={l.id} className="pc" style={{borderLeft:`4px solid ${est.color}`}} onClick={()=>navigate("lotes",l.id)}>
+                      <div key={l.id} className="pc" style={{borderLeft:`4px solid ${lEst.color}`}} onClick={()=>navigate("lotes",l.id)}>
                         <div className="fbt" style={{marginBottom:4}}>
                           <div className="pn">{l.nombre}</div>
-                          <span className="badge" style={{background:`${est.color}20`,color:est.color,borderColor:`${est.color}40`,fontSize:10}}>{est.label}</span>
+                          <span className="badge" style={{background:lEst.bg,color:lEst.color,borderColor:`${lEst.color}40`,fontSize:10}}>{lEst.label}</span>
                         </div>
                         <div className="tm txs" style={{marginBottom:10}}>{l.hectareas?`${l.hectareas} ha`:""} · {n} animales</div>
                         {dp!==null&&n>0&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Pastoreando</span><span className="iv tg">{dp}d</span></div>}
@@ -801,17 +849,21 @@ export default function HarasApp(){
             const nTotal=stockTotal(l.id);
             const ulFecha=stockUltimaFecha(l.id);
             const est=estadoPastura(diasDesde(l.ultimaDesmalezada));
+            const loteEst=getLoteEstado(l.id);
             const pres=calcPresion(nTotal,l.hectareas);
             const fp=primerIngreso(l.id);
             const dp=fp?diasDesde(fp):null;
-            const dd=l.fechaVacio&&nTotal===0?diasDesde(l.fechaVacio):null;
+            const _fv=getFechaVacio(l.id)||l.fechaVacio; const dd=_fv&&nTotal===0?diasDesde(_fv):null;
             const ds=diasDesde(l.ultimaSiembra);
             return(
               <>
                 <div className="mh">
                   <div>
                     <button className="btn bg sm" style={{marginBottom:8}} onClick={()=>navigate("lotes",null)}>← Volver</button>
-                    <h2>Lote {l.nombre}</h2>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}>
+                      <h2 style={{margin:0}}>Lote {l.nombre}</h2>
+                      <span className="badge" style={{background:loteEst.bg,color:loteEst.color,borderColor:`${loteEst.color}40`,fontSize:12}}>{loteEst.label}</span>
+                    </div>
                     <p>{l.hectareas?`${l.hectareas} ha`:""}{l.notas?` · ${l.notas}`:""}</p>
                   </div>
                   <div className="fb g2p fw">
