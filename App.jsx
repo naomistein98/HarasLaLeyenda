@@ -78,7 +78,7 @@ function getConsumoDiarioLote(lid, caballos){
       else total += 8.5 * unnamedCount; // default
     }
   }
-  return total > 0 ? total : null;
+  return total > 0 ? Math.round(total*10)/10 : null;
 }
 
 // Tasas de crecimiento kg MS / ha / día por cultivo y mes
@@ -91,6 +91,14 @@ const TASAS_CRECIMIENTO = {
   "moha":     {1:0,2:0,3:0,4:0,5:0,6:0,7:15,8:20,9:18,10:10,11:0,12:0},
   "natural":  {1:8,2:10,3:11,4:12,5:11,6:6,7:5,8:6,9:9,10:11,11:12,12:10},
 };
+
+function getEmoji(cultivo){
+  if(!cultivo) return "";
+  const c = cultivo.toLowerCase();
+  if(c.includes("avena")||c.includes("rye")||c.includes("raygrass")||c.includes("moha")||c.includes("trigo")) return "🌽";
+  if(c.includes("pastura")||c.includes("natural")||c.includes("trebol")||c.includes("lotus")) return "🌿";
+  return "🌱";
+}
 
 function getTasaCrecimiento(cultivo, mes){
   if(!cultivo) return null;
@@ -111,7 +119,7 @@ function getDisponibilidadDiaria(lote){
   const tasa = getTasaCrecimiento(cultivo, mes);
   if(!tasa || !lote.hectareas) return null;
   return {
-    kgDia: Math.round(tasa * lote.hectareas),
+    kgDia: Math.round(tasa * lote.hectareas * 10)/10,
     tasa,
     cultivo,
     hectareas: lote.hectareas,
@@ -124,9 +132,9 @@ const PASTURA_COMP = {
 
 const SIEMBRAS = {
   "A1":    [{p:"Mar 2025",c:"Maiz"},{p:"Sept 2025",c:"Maiz"},{p:"Dic 2025",c:"Maiz"},{p:"Mar 2026",c:"Pastura 1"}],
-  "A2":    [{p:"Mar 2025",c:"Rye Grass"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Sin dato"}],
+  "A2":    [{p:"Mar 2025",c:"Rye Grass"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Pastura"}],
   "A3":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
-  "A4":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Maiz"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Pastura Politictica"}],
+  "A4":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Maiz"},{p:"Dic 2025",c:"Pastura"},{p:"Mar 2026",c:"Pastura Politictica"}],
   "A5":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "A6":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "B1":    [{p:"Mar 2025",c:"Rye Grass"},{p:"Sept 2025",c:"Maiz"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Pastura 1"}],
@@ -155,8 +163,8 @@ const SIEMBRAS = {
   "F13":   [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "81":    [{p:"Mar 2025",c:"Avena"},{p:"Sept 2025",c:"Avena"},{p:"Dic 2025",c:"Moha"},{p:"Mar 2026",c:"Avena"}],
   "82":    [{p:"Mar 2025",c:"Natural"},{p:"Sept 2025",c:"Maiz"},{p:"Dic 2025",c:"Maiz"},{p:"Mar 2026",c:"Pastura 1"}],
-  "82A":   [{p:"Mar 2025",c:"Sin dato"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Sin dato"}],
-  "83":    [{p:"Mar 2025",c:"Sin dato"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Pastura 1"}],
+  "82A":   [{p:"Mar 2025",c:"Sin dato"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Sin dato"},{p:"Mar 2026",c:"Pastura"}],
+  "83":    [{p:"Mar 2025",c:"Sin dato"},{p:"Sept 2025",c:"Sin dato"},{p:"Dic 2025",c:"Pastura"},{p:"Mar 2026",c:"Pastura 1"}],
   "84":    [{p:"Mar 2025",c:"Avena"},{p:"Sept 2025",c:"Avena"},{p:"Dic 2025",c:"Moha"},{p:"Mar 2026",c:"Pastura 1"}],
   "85":    [{p:"Mar 2025",c:"Pastura 2024"},{p:"Sept 2025",c:"Pastura 2024"},{p:"Dic 2025",c:"Pastura 2024"},{p:"Mar 2026",c:"Pastura 2024"}],
   "86":    [{p:"Mar 2025",c:"Sin dato"},{p:"Sept 2025",c:"Rye Grass"},{p:"Dic 2025",c:"Moha"},{p:"Mar 2026",c:"Pastura 1"}],
@@ -164,7 +172,7 @@ const SIEMBRAS = {
   "88":    [{p:"Mar 2025",c:"Pastura 2025"},{p:"Sept 2025",c:"Pastura 2025"},{p:"Dic 2025",c:"Pastura 2025"},{p:"Mar 2026",c:"Pastura 2025"}],
   "S31":   [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "SMEDIO":[{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
-  "SCHICO":[{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Maiz"},{p:"Mar 2026",c:"Sin dato"}],
+  "SCHICO":[{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Maiz"},{p:"Mar 2026",c:"Pastura"}],
   "SARROYO":[{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "S41":   [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
   "R2":    [{p:"Mar 2025",c:"Pastura a"},{p:"Sept 2025",c:"Pastura a"},{p:"Dic 2025",c:"Pastura a"},{p:"Mar 2026",c:"Pastura a"}],
@@ -932,7 +940,7 @@ export default function HarasApp(){
                           const bal=c?d.kgDia-c:null;
                           return(<>
                             <div className="ir" style={{padding:"6px 0"}}><span className="ik">Disponib. diaria</span><span className="iv" style={{color:"#2d5a00",fontWeight:700}}>{d.kgDia} kg MS/d</span></div>
-                            {bal!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Balance</span><span className="iv" style={{color:bal>=0?"#228822":"#cc2222",fontWeight:700}}>{bal>=0?"+":""}{bal} kg MS/d</span></div>}
+                            {bal!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Balance</span><span className="iv" style={{color:bal>=0?"#228822":"#cc2222",fontWeight:700}}>{bal>=0?"+":""}{Math.round(bal*10)/10} kg MS/d</span></div>}
                           </>);
                         })()}
                         {l.notas&&<div className="mt2 txs tm">{l.notas}</div>}
@@ -1022,7 +1030,7 @@ export default function HarasApp(){
                             <div style={{height:1,background:"#ddd",margin:"8px 0"}}/>
                             <div className="ir" style={{padding:"4px 0"}}>
                               <span style={{fontSize:13,fontWeight:700,color:"#333"}}>{isOk?"Superávit":"Déficit"}</span>
-                              <span style={{fontFamily:"Playfair Display,serif",fontSize:22,fontWeight:700,color:isOk?"#228822":"#cc2222"}}>{isOk?"+":""}{balance} kg MS/día</span>
+                              <span style={{fontFamily:"Playfair Display,serif",fontSize:22,fontWeight:700,color:isOk?"#228822":"#cc2222"}}>{isOk?"+":""}{Math.round(balance*10)/10} kg MS/día</span>
                             </div>
                           </div>
                         );
@@ -1036,7 +1044,7 @@ export default function HarasApp(){
                             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                               <div>
                                 <div style={{fontFamily:"Playfair Display,serif",fontSize:26,color:"#2d5a00",fontWeight:700}}>{disp.kgDia} <span style={{fontSize:13}}>kg MS/día</span></div>
-                                <div style={{fontSize:12,color:"#557700",marginTop:2}}>{disp.tasa} kg/ha/día × {disp.hectareas} ha · {disp.cultivo}</div>
+                                <div style={{fontSize:12,color:"#557700",marginTop:2}}>{getEmoji(disp.cultivo)} {disp.cultivo} · {disp.tasa} kg/ha/día × {disp.hectareas} ha</div>
                               </div>
                             </div>
                           </div>
