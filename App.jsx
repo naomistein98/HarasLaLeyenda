@@ -328,6 +328,24 @@ export default function HarasApp(){
   const [lotes,setLotes]=useState(initLotes);
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
+  const [lluviasGlobal,setLluviasGlobal]=useState([]); // [{id, fecha, mm}]
+
+  // Lluvia acumulada desde el 1 de enero
+  const lluviaDesdeEnero = useMemo(()=>{
+    const inicio = new Date(new Date().getFullYear(),0,1);
+    return lluviasGlobal
+      .filter(l=>new Date(l.fecha)>=inicio)
+      .reduce((s,l)=>s+l.mm,0);
+  },[lluviasGlobal]);
+
+  // Lluvia acumulada en los últimos 21 días
+  const lluviaUltimos21 = useMemo(()=>{
+    const hace21 = new Date();
+    hace21.setDate(hace21.getDate()-21);
+    return lluviasGlobal
+      .filter(l=>new Date(l.fecha)>=hace21)
+      .reduce((s,l)=>s+l.mm,0);
+  },[lluviasGlobal]);
   const [loading,setLoading]=useState(false);
   const [dbConnected,setDbConnected]=useState(false);
 
@@ -354,6 +372,10 @@ export default function HarasApp(){
             };
           }));
           setDbConnected(true);
+        }
+        const lluviasDb = await sbSelect("lluvias_campo");
+        if(lluviasDb && lluviasDb.length>0){
+          setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:l.mm})));
         }
         const desmalezadasDb = await sbSelect("desmalezadas");
         if(desmalezadasDb && desmalezadasDb.length > 0){
@@ -398,6 +420,8 @@ export default function HarasApp(){
   const [intervPid,setIntervPid]=useState(null);
   const [lluviaPid,setLluviaPid]=useState(null);
   const [desmPid,setDesmPid]=useState(null);
+  const [showLluviaGlobal,setShowLluviaGlobal]=useState(false);
+  const [fLluviaG,setFLluviaG]=useState({fecha:hoy(),mm:""});
   const [desmalezadas,setDesmalezadas]=useState([]);
   const [busqueda,setBusqueda]=useState("");
 
@@ -493,6 +517,19 @@ export default function HarasApp(){
     sbUpsert("desmalezadas",[{id:newD.id,lote_id:lid,fecha,notas:""}]);
   }
 
+  function saveLluviaGlobal(){
+    if(!fLluviaG.mm) return;
+    const nueva = {id:"LG"+Date.now(), fecha:fLluviaG.fecha, mm:parseFloat(fLluviaG.mm)};
+    setLluviasGlobal(p=>[...p, nueva]);
+    sbUpsert("lluvias_campo",[{id:nueva.id, fecha:nueva.fecha, mm:nueva.mm}]);
+    setFLluviaG({fecha:hoy(),mm:""});
+    setShowLluviaGlobal(false);
+  }
+  function delLluviaGlobal(id){
+    setLluviasGlobal(p=>p.filter(l=>l.id!==id));
+    sbDelete("lluvias_campo",id);
+  }
+
   function saveDesm(){
     if(!desmPid)return;
     const newD={id:"D"+Date.now(),loteId:desmPid,fecha:fD.fecha,notas:fD.notas};
@@ -573,6 +610,41 @@ export default function HarasApp(){
                     <div key={i} className="card"><div className="sv">{s.v}</div><div className="sl">{s.l}</div></div>
                   ))}
                 </div>
+                {/* Lluvia global */}
+                <div className="card" style={{marginBottom:20}}>
+                  <div className="fbt mb3">
+                    <div className="ct" style={{marginBottom:0}}>🌧 Lluvia del campo</div>
+                    <button className="btn bp sm" onClick={()=>setShowLluviaGlobal(true)}>+ Registrar lluvia</button>
+                  </div>
+                  <div className="g2" style={{gap:12,marginBottom:16}}>
+                    <div style={{background:"#f0f7ff",borderRadius:10,padding:"14px 18px",border:"1px solid #c8e0ff"}}>
+                      <div style={{fontSize:11,color:"#3366aa",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:4}}>Desde el 1° de enero</div>
+                      <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#1a4080",fontWeight:700}}>{lluviaDesdeEnero} <span style={{fontSize:14}}>mm</span></div>
+                    </div>
+                    <div style={{background:"#f0f7ff",borderRadius:10,padding:"14px 18px",border:"1px solid #c8e0ff"}}>
+                      <div style={{fontSize:11,color:"#3366aa",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:4}}>Últimos 21 días</div>
+                      <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#1a4080",fontWeight:700}}>{lluviaUltimos21} <span style={{fontSize:14}}>mm</span></div>
+                    </div>
+                  </div>
+                  {lluviasGlobal.length>0&&(
+                    <div>
+                      <div style={{fontSize:11,color:"#888",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:8}}>Registros recientes</div>
+                      <table className="table">
+                        <thead><tr><th>Fecha</th><th>mm</th><th></th></tr></thead>
+                        <tbody>
+                          {[...lluviasGlobal].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8).map(l=>(
+                            <tr key={l.id}>
+                              <td>{fmt(l.fecha)}</td>
+                              <td><strong>{l.mm} mm</strong></td>
+                              <td><button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>delLluviaGlobal(l.id)}>✕</button></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
                 <div className="card">
                   <div className="fbt mb3">
                     <div className="ct" style={{marginBottom:0}}>Estado de lotes</div>
@@ -654,7 +726,6 @@ export default function HarasApp(){
             const dp=fp?diasDesde(fp):null;
             const dd=l.fechaVacio&&nTotal===0?diasDesde(l.fechaVacio):null;
             const ds=diasDesde(l.ultimaSiembra);
-            const llTotal=(l.lluvias||[]).reduce((s,x)=>s+x.mm,0);
             return(
               <>
                 <div className="mh">
@@ -735,18 +806,11 @@ export default function HarasApp(){
                     <div className="card">
                       <div className="stit">Agua</div>
                       <div className="ir"><span className="ik">Riego</span><span className="iv">{l.tieneRiego?<span className="badge b">✓ {l.riegoDiario} mm/día</span>:<span className="tm">Sin riego</span>}</span></div>
-                      <div className="ir"><span className="ik">Total lluvia registrada</span><span className="iv tg">{llTotal} mm</span></div>
                       <div className="div"/>
-                      <div className="stit">Lluvias</div>
-                      {!(l.lluvias||[]).length
-                        ?<div className="tm txs">Sin registros</div>
-                        :[...(l.lluvias||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(x=>(
-                          <div key={x.id} className="li">
-                            <span>{fmt(x.fecha)}</span>
-                            <div className="fb g2p"><span className="badge b">{x.mm} mm</span><button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>delLluvia(l.id,x.id)}>✕</button></div>
-                          </div>
-                        ))
-                      }
+                      <div className="stit">Lluvia del campo</div>
+                      <div className="ir"><span className="ik">Desde el 1° de enero</span><span className="iv" style={{color:"#1a4080"}}>{lluviaDesdeEnero} mm</span></div>
+                      <div className="ir"><span className="ik">Últimos 21 días</span><span className="iv" style={{color:"#1a4080"}}>{lluviaUltimos21} mm</span></div>
+                      <div style={{marginTop:8,fontSize:11,color:"#888"}}>Los registros se gestionan desde el Dashboard</div>
                     </div>
                     <div className="card">
                       <div className="stit">Intervenciones</div>
@@ -1028,6 +1092,20 @@ export default function HarasApp(){
           </div>
         )}
 
+        {/* MODAL: Lluvia global */}
+        {showLluviaGlobal&&(
+          <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowLluviaGlobal(false)}>
+            <div className="md" style={{maxWidth:380}}>
+              <div className="mtit">Registrar lluvia</div>
+              <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={fLluviaG.fecha} onChange={e=>setFLluviaG(f=>({...f,fecha:e.target.value}))}/></div>
+              <div className="fg"><label className="fl">Milímetros *</label><input className="fi" type="number" step="0.5" value={fLluviaG.mm} onChange={e=>setFLluviaG(f=>({...f,mm:e.target.value}))} placeholder="Ej: 22"/></div>
+              <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
+                <button className="btn bg" onClick={()=>setShowLluviaGlobal(false)}>Cancelar</button>
+                <button className="btn bp" onClick={saveLluviaGlobal}>Registrar</button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* MODAL: Desmalezada */}
         {modal==="desm"&&(
           <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
