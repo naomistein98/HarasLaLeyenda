@@ -374,6 +374,13 @@ export default function HarasApp(){
       .reduce((s,l)=>s+l.mm,0);
   },[lluviasGlobal]);
 
+  // Días sin lluvia
+  const diasSinLluvia = useMemo(()=>{
+    if(!lluviasGlobal.length) return null;
+    const ultima = [...lluviasGlobal].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+    return diasDesde(ultima.fecha);
+  },[lluviasGlobal]);
+
   // Lluvia acumulada en los últimos 21 días
   const lluviaUltimos21 = useMemo(()=>{
     const hace21 = new Date();
@@ -685,7 +692,7 @@ export default function HarasApp(){
                     <div className="ct" style={{marginBottom:0}}>🌧 Lluvia del campo</div>
                     <button className="btn bp sm" onClick={()=>setShowLluviaGlobal(true)}>+ Registrar lluvia</button>
                   </div>
-                  <div className="g2" style={{gap:12,marginBottom:16}}>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:16}}>
                     <div style={{background:"#f0f7ff",borderRadius:10,padding:"14px 18px",border:"1px solid #c8e0ff"}}>
                       <div style={{fontSize:11,color:"#3366aa",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:4}}>Desde el 1° de enero</div>
                       <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#1a4080",fontWeight:700}}>{lluviaDesdeEnero} <span style={{fontSize:14}}>mm</span></div>
@@ -693,6 +700,10 @@ export default function HarasApp(){
                     <div style={{background:"#f0f7ff",borderRadius:10,padding:"14px 18px",border:"1px solid #c8e0ff"}}>
                       <div style={{fontSize:11,color:"#3366aa",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:4}}>Últimos 21 días</div>
                       <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#1a4080",fontWeight:700}}>{lluviaUltimos21} <span style={{fontSize:14}}>mm</span></div>
+                    </div>
+                    <div style={{background:diasSinLluvia===null?"#f5f5f0":diasSinLluvia>14?"#fff0f0":diasSinLluvia>7?"#fff8f0":"#f0fff4",borderRadius:10,padding:"14px 18px",border:`1px solid ${diasSinLluvia===null?"#ddd":diasSinLluvia>14?"#ffb0b0":diasSinLluvia>7?"#ffd0a0":"#a0e0b0"}`}}>
+                      <div style={{fontSize:11,color:diasSinLluvia===null?"#888":diasSinLluvia>14?"#aa2222":diasSinLluvia>7?"#aa6600":"#226622",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:4}}>Días sin lluvia</div>
+                      <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:diasSinLluvia===null?"#888":diasSinLluvia>14?"#cc2222":diasSinLluvia>7?"#cc7700":"#228822",fontWeight:700}}>{diasSinLluvia===null?"—":diasSinLluvia} <span style={{fontSize:14}}>{diasSinLluvia!==null?"días":""}</span></div>
                     </div>
                   </div>
                   {lluviasGlobal.length>0&&(
@@ -879,6 +890,7 @@ export default function HarasApp(){
                       <div className="stit">Lluvia del campo</div>
                       <div className="ir"><span className="ik">Desde el 1° de enero</span><span className="iv" style={{color:"#1a4080"}}>{lluviaDesdeEnero} mm</span></div>
                       <div className="ir"><span className="ik">Últimos 21 días</span><span className="iv" style={{color:"#1a4080"}}>{lluviaUltimos21} mm</span></div>
+                      <div className="ir"><span className="ik">Días sin lluvia</span><span className="iv" style={{color:diasSinLluvia===null?"#888":diasSinLluvia>14?"#cc2222":diasSinLluvia>7?"#cc7700":"#228822"}}>{diasSinLluvia===null?"—":`${diasSinLluvia} días`}</span></div>
                       <div style={{marginTop:8,fontSize:11,color:"#888"}}>Los registros se gestionan desde el Dashboard</div>
                     </div>
                     <div className="card">
