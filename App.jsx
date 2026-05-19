@@ -19,13 +19,67 @@ async function sbFetch(table, method="GET", body=null, filters="") {
   return text ? JSON.parse(text) : null;
 }
 
-async function sbSelect(table) { return await sbFetch(table, "GET", null, "?select=*&order=id"); }
+async function sbSelect(table) {
+  const order = table==="lluvias_campo" ? "fecha" : "id";
+  return await sbFetch(table, "GET", null, `?select=*&order=${order}`);
+}
 async function sbUpsert(table, data) { return await sbFetch(table, "POST", data, "?on_conflict=id"); }
 async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
 
 
 const CATEGORIAS = ["Padrillo", "Yegua madre", "Potro", "Potranca", "Castrado", "Yegua de trabajo"];
 const ALIMENTOS  = ["Heno de alfalfa","Heno de pastura","Grano de maíz","Avena","Pellet comercial","Suplemento proteico","Sal mineral"];
+
+// Consumo neto de pasto por categoría (kg MS/día por animal)
+const CONSUMO_CATEGORIA = {
+  "yegua madre":  10,
+  "yegua preñada": 10,
+  "con cría":     10,
+  "yegua vacía":  8.5,
+  "sin cría":     8.5,
+  "potrillos":    8,
+  "potrillo":     8,
+  "potrancas":    8,
+  "potranca":     8,
+  "destete":      8,
+  "yegua ama":    10,
+};
+
+function getConsumoCategoria(catStr){
+  if(!catStr) return null;
+  const c = catStr.toLowerCase();
+  for(const key of Object.keys(CONSUMO_CATEGORIA)){
+    if(c.includes(key)) return CONSUMO_CATEGORIA[key];
+  }
+  return null;
+}
+
+// Get total daily consumption for a lote (named + unnamed animals)
+function getConsumoDiarioLote(lid, caballos){
+  let total = 0;
+  // Named horses
+  const named = caballos.filter(c=>c.loteId===lid);
+  for(const c of named){
+    const cons = getConsumoCategoria(c.categoria);
+    if(cons) total += cons;
+  }
+  // Unnamed animals from STOCK_HISTORIAL
+  const hist = STOCK_HISTORIAL[lid];
+  if(hist && hist.length>0){
+    const namedCount = named.length;
+    const lastEntry = [...hist].sort((a,b)=>b.f.localeCompare(a.f)).find(x=>x.tot!==null);
+    const totalAnimals = lastEntry ? lastEntry.tot : 0;
+    const unnamedCount = Math.max(0, totalAnimals - namedCount);
+    if(unnamedCount > 0){
+      // Find category from historial description
+      const lastCat = lastEntry ? lastEntry.cat : "";
+      const cons = getConsumoCategoria(lastCat);
+      if(cons) total += cons * unnamedCount;
+      else total += 8.5 * unnamedCount; // default
+    }
+  }
+  return total > 0 ? total : null;
+}
 
 // Tasas de crecimiento kg MS / ha / día por cultivo y mes
 const TASAS_CRECIMIENTO = {
@@ -453,10 +507,12 @@ export default function HarasApp(){
           }));
           setDbConnected(true);
         }
-        const lluviasDb = await sbSelect("lluvias_campo");
-        if(lluviasDb && lluviasDb.length>0){
-          setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:l.mm})));
-        }
+        try {
+          const lluviasDb = await sbSelect("lluvias_campo");
+          if(lluviasDb && lluviasDb.length>0){
+            setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:parseFloat(l.mm)})));
+          }
+        } catch(e){ console.log("lluvias_campo error:", e); }
         const desmalezadasDb = await sbSelect("desmalezadas");
         if(desmalezadasDb && desmalezadasDb.length > 0){
           setDesmalezadas(desmalezadasDb.map(d=>({id:d.id,loteId:d.lote_id,fecha:d.fecha,notas:d.notas||""})));
@@ -811,7 +867,7 @@ export default function HarasApp(){
                     <button className="btn bg sm" onClick={()=>navigate("lotes",null)}>Ver todos →</button>
                   </div>
                   <table className="table">
-                    <thead><tr><th>Lote</th><th>Ha</th><th>Animales</th><th>Pastoreando</th><th>Descanso</th><th>Últ. desmalezada</th><th>Pastura</th><th>Disponib. diaria</th></tr></thead>
+                    <thead><tr><th>Lote</th><th>Ha</th><th>Animales</th><th>Pastoreando</th><th>Descanso</th><th>Últ. desmalezada</th><th>Pastura</th><th>Disponib. diaria</th><th>Balance</th></tr></thead>
                     <tbody>
                       {lotes.map(l=>{
                         const n=stockTotal(l.id);
@@ -869,7 +925,16 @@ export default function HarasApp(){
                         {dp!==null&&n>0&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Pastoreando</span><span className="iv tg">{dp}d</span></div>}
                         {dd!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Descanso</span><span className="iv" style={{color:"#4caf6e"}}>{dd}d</span></div>}
                         <div className="ir" style={{padding:"6px 0"}}><span className="ik">Desmalezada</span><span className="iv">{fmt(l.ultimaDesmalezada)}</span></div>
-                        {(()=>{const d=getDisponibilidadDiaria(l);return d?<div className="ir" style={{padding:"6px 0"}}><span className="ik">Disponib. diaria</span><span className="iv" style={{color:"#2d5a00",fontWeight:700}}>{d.kgDia} kg MS/d</span></div>:null;})()}
+                        {(()=>{
+                          const d=getDisponibilidadDiaria(l);
+                          const c=getConsumoDiarioLote(l.id,caballos);
+                          if(!d) return null;
+                          const bal=c?d.kgDia-c:null;
+                          return(<>
+                            <div className="ir" style={{padding:"6px 0"}}><span className="ik">Disponib. diaria</span><span className="iv" style={{color:"#2d5a00",fontWeight:700}}>{d.kgDia} kg MS/d</span></div>
+                            {bal!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Balance</span><span className="iv" style={{color:bal>=0?"#228822":"#cc2222",fontWeight:700}}>{bal>=0?"+":""}{bal} kg MS/d</span></div>}
+                          </>);
+                        })()}
                         {l.notas&&<div className="mt2 txs tm">{l.notas}</div>}
                       </div>
                     );
@@ -937,6 +1002,31 @@ export default function HarasApp(){
                       <div className="ir"><span className="ik">Superficie</span><span className="iv">{l.hectareas?`${l.hectareas} ha`:"—"}</span></div>
                       <div className="ir"><span className="ik">Presión de pastoreo</span><span className="iv">{pres?`${pres} cab/ha`:"—"}</span></div>
                       {pres&&<div className="mt2 txs" style={{color:"#a89070"}}>{parseFloat(pres)>1.5?"⚠️ Presión alta — considerar rotar":parseFloat(pres)>0.8?"✓ Presión moderada":"✓ Presión baja"}</div>}
+                      {(()=>{
+                        const disp=getDisponibilidadDiaria(l);
+                        const cons=getConsumoDiarioLote(l.id,caballos);
+                        if(!disp||!cons) return null;
+                        const balance=disp.kgDia-cons;
+                        const isOk=balance>=0;
+                        return(
+                          <div style={{marginTop:14,padding:"12px 14px",borderRadius:8,background:isOk?"#f0fff4":"#fff0f0",border:`1px solid ${isOk?"#a0e0b0":"#ffb0b0"}`}}>
+                            <div style={{fontSize:11,color:isOk?"#226622":"#992222",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:8}}>⚖️ Balance forrajero diario</div>
+                            <div className="ir" style={{padding:"4px 0"}}>
+                              <span style={{fontSize:13,color:"#333"}}>Disponible</span>
+                              <span style={{fontWeight:700,color:"#2d5a00"}}>{disp.kgDia} kg MS</span>
+                            </div>
+                            <div className="ir" style={{padding:"4px 0"}}>
+                              <span style={{fontSize:13,color:"#333"}}>Consumo ({nTotal} animales)</span>
+                              <span style={{fontWeight:700,color:"#992222"}}>{cons} kg MS</span>
+                            </div>
+                            <div style={{height:1,background:"#ddd",margin:"8px 0"}}/>
+                            <div className="ir" style={{padding:"4px 0"}}>
+                              <span style={{fontSize:13,fontWeight:700,color:"#333"}}>{isOk?"Superávit":"Déficit"}</span>
+                              <span style={{fontFamily:"Playfair Display,serif",fontSize:22,fontWeight:700,color:isOk?"#228822":"#cc2222"}}>{isOk?"+":""}{balance} kg MS/día</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                       {(()=>{
                         const disp=getDisponibilidadDiaria(l);
                         if(!disp) return null;
