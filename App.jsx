@@ -328,7 +328,31 @@ export default function HarasApp(){
   const [lotes,setLotes]=useState(initLotes);
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
-  const [lluviasGlobal,setLluviasGlobal]=useState([]); // [{id, fecha, mm}]
+  const [lluviasGlobal,setLluviasGlobal]=useState([]);
+
+  // Browser history management
+  useEffect(()=>{
+    const handlePop = (e)=>{
+      if(e.state){
+        if(e.state.view) setView(e.state.view);
+        if(e.state.selLote !== undefined) setSelLote(e.state.selLote);
+      } else {
+        setView("dashboard");
+        setSelLote(null);
+      }
+    };
+    window.addEventListener("popstate", handlePop);
+    // Set initial state
+    window.history.replaceState({view:"dashboard", selLote:null}, "");
+    return ()=>window.removeEventListener("popstate", handlePop);
+  },[]);
+
+  // Push history when view changes
+  function navigate(newView, newLote=null){
+    setView(newView);
+    setSelLote(newLote);
+    window.history.pushState({view:newView, selLote:newLote}, "");
+  } // [{id, fecha, mm}]
 
   // Lluvia acumulada desde el 1 de enero
   const lluviaDesdeEnero = useMemo(()=>{
@@ -580,7 +604,7 @@ export default function HarasApp(){
           <div className="nsec">
             <div className="nlbl">Menú</div>
             {nav.map(n=>(
-              <button key={n.id} className={`ni ${view===n.id?"active":""}`} onClick={()=>{setView(n.id);setSelLote(null);setBusqueda("");setSidebarOpen(false);}}>
+              <button key={n.id} className={`ni ${view===n.id?"active":""}`} onClick={()=>{navigate(n.id,null);setBusqueda("");setSidebarOpen(false);}}>
                 <span className="ic">{n.ic}</span>{n.lb}
               </button>
             ))}
@@ -648,7 +672,7 @@ export default function HarasApp(){
                 <div className="card">
                   <div className="fbt mb3">
                     <div className="ct" style={{marginBottom:0}}>Estado de lotes</div>
-                    <button className="btn bg sm" onClick={()=>setView("lotes")}>Ver todos →</button>
+                    <button className="btn bg sm" onClick={()=>navigate("lotes",null)}>Ver todos →</button>
                   </div>
                   <table className="table">
                     <thead><tr><th>Lote</th><th>Ha</th><th>Animales</th><th>Pastoreando</th><th>Descanso</th><th>Últ. desmalezada</th><th>Pastura</th></tr></thead>
@@ -660,8 +684,8 @@ export default function HarasApp(){
                         const dp=fp?diasDesde(fp):null;
                         const dd=l.fechaVacio&&n===0?diasDesde(l.fechaVacio):null;
                         return(
-                          <tr key={l.id} style={{cursor:"pointer"}} onClick={()=>{setView("lotes");setSelLote(l.id);}}>
-                            <td><button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:600,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>{setView("lotes");setSelLote(l.id);}}>{l.nombre}</button></td>
+                          <tr key={l.id} style={{cursor:"pointer"}} onClick={()=>navigate("lotes",l.id)}>
+                            <td><button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:600,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",l.id)}>{l.nombre}</button></td>
                             <td className="tm">{l.hectareas||"—"}</td>
                             <td>{n>0?n:<span className="tm">0</span>}</td>
                             <td>{n>0&&dp!==null?<span className="tg">{dp}d</span>:<span className="tm">—</span>}</td>
@@ -695,7 +719,7 @@ export default function HarasApp(){
                     const dp=fp?diasDesde(fp):null;
                     const dd=l.fechaVacio&&n===0?diasDesde(l.fechaVacio):null;
                     return(
-                      <div key={l.id} className="pc" style={{borderLeft:`4px solid ${est.color}`}} onClick={()=>setSelLote(l.id)}>
+                      <div key={l.id} className="pc" style={{borderLeft:`4px solid ${est.color}`}} onClick={()=>navigate("lotes",l.id)}>
                         <div className="fbt" style={{marginBottom:4}}>
                           <div className="pn">{l.nombre}</div>
                           <span className="badge" style={{background:`${est.color}20`,color:est.color,borderColor:`${est.color}40`,fontSize:10}}>{est.label}</span>
@@ -730,7 +754,7 @@ export default function HarasApp(){
               <>
                 <div className="mh">
                   <div>
-                    <button className="btn bg sm" style={{marginBottom:8}} onClick={()=>setSelLote(null)}>← Volver</button>
+                    <button className="btn bg sm" style={{marginBottom:8}} onClick={()=>navigate("lotes",null)}>← Volver</button>
                     <h2>Lote {l.nombre}</h2>
                     <p>{l.hectareas?`${l.hectareas} ha`:""}{l.notas?` · ${l.notas}`:""}</p>
                   </div>
@@ -945,7 +969,7 @@ export default function HarasApp(){
                               <td><span className="badge">{c.categoria}</span></td>
                               <td className="tm txs">{c.color||"—"}</td>
                               <td>{c.peso?`${c.peso} kg`:"—"}</td>
-                              <td>{lot?<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:500,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>{setView("lotes");setSelLote(lot.id);}}>{lot.nombre}</button>:"—"}</td>
+                              <td>{lot?<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:500,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",lot.id)}>{lot.nombre}</button>:"—"}</td>
                               <td className="tg" style={{fontWeight:500}}>{c.fechaIngreso?`${diasDesde(c.fechaIngreso)}d`:"—"}</td>
                               <td style={{maxWidth:180}}>{c.alimentos.map(a=><span key={a} className="tag">{a}</span>)}</td>
                               <td><div className="fb g2p">
@@ -981,7 +1005,7 @@ export default function HarasApp(){
                           <tr key={l.id}>
                             <td>
                               <button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:600,fontSize:13,padding:0,textDecoration:"underline"}}
-                                onClick={()=>{setView("lotes");setSelLote(l.id);}}>
+                                onClick={()=>navigate("lotes",l.id)}>
                                 {l.nombre}
                               </button>
                             </td>
