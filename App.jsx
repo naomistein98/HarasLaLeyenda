@@ -329,6 +329,18 @@ export default function HarasApp(){
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
   const [lluviasGlobal,setLluviasGlobal]=useState([]);
+  const [undoStack,setUndoStack]=useState([]); // [{description, undo: fn}]
+
+  function pushUndo(description, undoFn){
+    setUndoStack(prev=>[{description, undo:undoFn}, ...prev].slice(0,10));
+  }
+  function doUndo(){
+    setUndoStack(prev=>{
+      if(!prev.length) return prev;
+      prev[0].undo();
+      return prev.slice(1);
+    });
+  }
 
   // Browser history management
   useEffect(()=>{
@@ -512,7 +524,16 @@ export default function HarasApp(){
     saveCaballoToDb(newC);
     closeModal();
   }
-  function delCab(id){setCaballos(p=>p.filter(c=>c.id!==id)); sbDelete("caballos",id);}
+  function delCab(id){
+    const cab = caballos.find(c=>c.id===id);
+    if(!cab) return;
+    setCaballos(p=>p.filter(c=>c.id!==id));
+    sbDelete("caballos",id);
+    pushUndo(`Borrar caballo "${cab.nombre}"`, ()=>{
+      setCaballos(p=>[...p, cab]);
+      saveCaballoToDb(cab);
+    });
+  }
   function editCab(c){setFC({nombre:c.nombre,categoria:c.categoria,alimentos:[...c.alimentos],loteId:c.loteId,peso:c.peso,color:c.color,fechaIngreso:c.fechaIngreso});setEditId(c.id);setModal("cab");}
   function togAlim(a){setFC(f=>({...f,alimentos:f.alimentos.includes(a)?f.alimentos.filter(x=>x!==a):[...f.alimentos,a]}));}
 
@@ -550,8 +571,14 @@ export default function HarasApp(){
     setShowLluviaGlobal(false);
   }
   function delLluviaGlobal(id){
+    const lluvia = lluviasGlobal.find(l=>l.id===id);
+    if(!lluvia) return;
     setLluviasGlobal(p=>p.filter(l=>l.id!==id));
     sbDelete("lluvias_campo",id);
+    pushUndo(`Borrar lluvia ${lluvia.mm}mm del ${fmt(lluvia.fecha)}`, ()=>{
+      setLluviasGlobal(p=>[...p, lluvia]);
+      sbUpsert("lluvias_campo",[{id:lluvia.id, fecha:lluvia.fecha, mm:lluvia.mm}]);
+    });
   }
 
   function saveDesm(){
@@ -566,8 +593,14 @@ export default function HarasApp(){
     closeModal();
   }
   function delDesm(id){
+    const desm = desmalezadas.find(d=>d.id===id);
+    if(!desm) return;
     setDesmalezadas(p=>p.filter(d=>d.id!==id));
     sbDelete("desmalezadas",id);
+    pushUndo(`Borrar desmalezada del ${fmt(desm.fecha)}`, ()=>{
+      setDesmalezadas(p=>[...p, desm]);
+      sbUpsert("desmalezadas",[{id:desm.id, lote_id:desm.loteId, fecha:desm.fecha, notas:desm.notas||null}]);
+    });
   }
 
   function saveInterv(){
@@ -575,7 +608,14 @@ export default function HarasApp(){
     setLotes(p=>p.map(x=>x.id===intervPid?{...x,intervenciones:[...x.intervenciones,{...fI,id:"I"+Date.now()}]}:x));
     closeModal();
   }
-  function delInterv(lid,iid){setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:x.intervenciones.filter(i=>i.id!==iid)}:x));}
+  function delInterv(lid,iid){
+    const lote = lotes.find(x=>x.id===lid);
+    const interv = lote?.intervenciones?.find(i=>i.id===iid);
+    setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:x.intervenciones.filter(i=>i.id!==iid)}:x));
+    pushUndo(`Borrar intervención "${interv?.elemento||""}"`, ()=>{
+      if(interv) setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:[...x.intervenciones,interv]}:x));
+    });
+  }
 
   function saveLluvia(){
     if(!fLl.mm||!lluviaPid)return;
@@ -598,6 +638,11 @@ export default function HarasApp(){
       <style>{css}</style>
       <div className="app">
         <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button>
+        {undoStack.length>0&&(
+          <button onClick={doUndo} style={{position:"fixed",bottom:20,right:20,zIndex:300,background:"#1a1410",color:"#fff",border:"none",borderRadius:10,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,.25)",display:"flex",alignItems:"center",gap:8}}>
+            ↩ Deshacer <span style={{fontSize:11,opacity:.7}}>"{undoStack[0]?.description}"</span>
+          </button>
+        )}
         <div className={`overlay ${sidebarOpen?"open":""}`} onClick={()=>setSidebarOpen(false)}/>
         <aside className={`sidebar ${sidebarOpen?"open":""}`}>
           <div className="slogo"><h1>Haras<br/>Manager</h1><p>Sistema de gestión</p></div>
