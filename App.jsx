@@ -1011,6 +1011,26 @@ export default function HarasApp(){
                       <div className="ir"><span className="ik">Presión de pastoreo</span><span className="iv">{pres?`${pres} cab/ha`:"—"}</span></div>
                       {pres&&<div className="mt2 txs" style={{color:"#a89070"}}>{parseFloat(pres)>1.5?"⚠️ Presión alta — considerar rotar":parseFloat(pres)>0.8?"✓ Presión moderada":"✓ Presión baja"}</div>}
                       {(()=>{
+                        // Stock acumulado en descanso
+                        if(nTotal===0 && dd!==null){
+                          const disp=getDisponibilidadDiaria(l);
+                          if(!disp||!dd) return null;
+                          const stockAcum=Math.round(disp.tasa*dd*l.hectareas*10)/10;
+                          return(
+                            <div style={{marginTop:14,padding:"12px 14px",borderRadius:8,background:"#f0f8e8",border:"1px solid #a0e0b0"}}>
+                              <div style={{fontSize:11,color:"#226622",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:8}}>🌿 Stock acumulado en descanso</div>
+                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                                <div>
+                                  <div style={{fontFamily:"Playfair Display,serif",fontSize:26,color:"#2d5a00",fontWeight:700}}>{stockAcum.toLocaleString()} <span style={{fontSize:13}}>kg MS</span></div>
+                                  <div style={{fontSize:12,color:"#557700",marginTop:2}}>{disp.tasa} kg/ha/día × {dd} días × {l.hectareas} ha</div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                      {(()=>{
                         const disp=getDisponibilidadDiaria(l);
                         const cons=getConsumoDiarioLote(l.id,caballos);
                         if(!disp||!cons) return null;
