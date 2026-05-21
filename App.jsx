@@ -424,6 +424,38 @@ body{font-family:'DM Sans',sans-serif;background:#f5f5f0;color:#111111;min-heigh
 .search-input:focus{border-color:var(--gold)}
 `;
 
+// Consumo detallado por categoría — editable desde Info Modificable
+const CONSUMO_DETALLE_INIT = {
+  "yegua madre": {
+    peso:520, pctConsumo:2.5,
+    raciones:[
+      {nombre:"Heno", cantidad:2, pctMS:80},
+      {nombre:"Suplemento", cantidad:2.25, pctMS:90},
+    ]
+  },
+  "yegua vacía": {
+    peso:520, pctConsumo:2.5,
+    raciones:[
+      {nombre:"Heno", cantidad:2, pctMS:80},
+      {nombre:"Suplemento", cantidad:2.25, pctMS:90},
+    ]
+  },
+  "potrillos": {
+    peso:300, pctConsumo:2.5,
+    raciones:[
+      {nombre:"Ración", cantidad:1.6, pctMS:90},
+      {nombre:"Alfalfa", cantidad:1.25, pctMS:80},
+    ]
+  },
+  "potrancas": {
+    peso:300, pctConsumo:2.5,
+    raciones:[
+      {nombre:"Ración", cantidad:1.6, pctMS:90},
+      {nombre:"Alfalfa", cantidad:1.25, pctMS:80},
+    ]
+  },
+};
+
 // ── Edit Tasa Form Component ──────────────────────────────────────────────
 function EditTasaForm({tasasActivas,setTasasActivas,paramCrecimiento,setParamCrecimiento,closeModal,sbUpsert,hoy}){
   const meses = [{n:5,l:"Mayo"},{n:6,l:"Junio"}];
@@ -480,34 +512,79 @@ function EditTasaForm({tasasActivas,setTasasActivas,paramCrecimiento,setParamCre
 }
 
 // ── Edit Consumo Form Component ────────────────────────────────────────────
-function EditConsumoForm({consumosActivos,setConsumosActivos,paramConsumo,setParamConsumo,closeModal,sbUpsert,hoy}){
-  const categorias = Object.keys(consumosActivos);
+function EditConsumoForm({consumosActivos,setConsumosActivos,consumoDetalle,setConsumoDetalle,paramConsumo,setParamConsumo,closeModal,sbUpsert,hoy}){
+  const categorias = Object.keys(CONSUMO_DETALLE_INIT);
   const [categoria,setCategoria]=useState(categorias[0]);
-  const [valor,setValor]=useState("");
   const [notas,setNotas]=useState("");
+  const det = consumoDetalle[categoria]||CONSUMO_DETALLE_INIT[categoria]||{peso:500,pctConsumo:2.5,raciones:[]};
+  const [peso,setPeso]=useState(det.peso);
+  const [pct,setPct]=useState(det.pctConsumo);
+  const [raciones,setRaciones]=useState(det.raciones||[]);
+
+  // Recalc when category changes
+  const handleCat = (c)=>{
+    setCategoria(c);
+    const d=consumoDetalle[c]||CONSUMO_DETALLE_INIT[c]||{peso:500,pctConsumo:2.5,raciones:[]};
+    setPeso(d.peso); setPct(d.pctConsumo); setRaciones(d.raciones||[]);
+  };
+
+  const totalMS = Math.round(peso*pct/100*10)/10;
+  const totalRaciones = Math.round(raciones.reduce((s,r)=>s+(r.cantidad*(r.pctMS/100)),0)*10)/10;
+  const neto = Math.round((totalMS-totalRaciones)*10)/10;
+
+  function updateRacion(i,field,val){
+    setRaciones(prev=>prev.map((r,idx)=>idx===i?{...r,[field]:parseFloat(val)||0}:r));
+  }
 
   function save(){
-    if(!valor) return;
-    const nuevoConsumo=parseFloat(valor);
-    setConsumosActivos(prev=>({...prev,[categoria]:nuevoConsumo}));
-    const newEntry={id:"CC"+Date.now(),categoria,consumo_neto:nuevoConsumo,fecha_cambio:hoy(),notas};
+    const newDet={peso,pctConsumo:pct,raciones};
+    setConsumoDetalle(prev=>({...prev,[categoria]:newDet}));
+    setConsumosActivos(prev=>({...prev,[categoria]:neto,
+      [categoria+" preñada"]:neto, ["con cría"]:neto,
+    }));
+    const newEntry={id:"CC"+Date.now(),categoria,consumo_neto:neto,fecha_cambio:hoy(),notas};
     setParamConsumo(prev=>[...prev,newEntry]);
-    sbUpsert("parametros_consumo",[{id:newEntry.id,categoria,peso_kg:null,pct_consumo:null,suplementos:null,consumo_neto:nuevoConsumo,fecha_cambio:newEntry.fecha_cambio,notas:notas||null}]);
+    sbUpsert("parametros_consumo",[{id:newEntry.id,categoria,peso_kg:peso,pct_consumo:pct,suplementos:JSON.stringify(raciones),consumo_neto:neto,fecha_cambio:newEntry.fecha_cambio,notas:notas||null}]);
     closeModal();
   }
 
   return(
     <div>
       <div className="fg"><label className="fl">Categoría</label>
-        <select className="fi" value={categoria} onChange={e=>setCategoria(e.target.value)}>
+        <select className="fi" value={categoria} onChange={e=>handleCat(e.target.value)}>
           {categorias.map(c=><option key={c} value={c}>{c}</option>)}
         </select>
       </div>
-      <div className="fg"><label className="fl">Valor actual</label>
-        <div style={{padding:"8px 12px",background:"#f0f8e0",borderRadius:8,fontSize:13,color:"#2d5a00",fontWeight:700,marginBottom:8}}>
-          Actual: {consumosActivos[categoria] || "—"} kg MS/día
+      <div className="fr">
+        <div className="fg"><label className="fl">Peso vivo (kg)</label>
+          <input className="fi" type="number" value={peso} onChange={e=>setPeso(parseFloat(e.target.value)||0)}/>
         </div>
-        <input className="fi" type="number" step="0.1" value={valor} onChange={e=>setValor(e.target.value)} placeholder="Nuevo valor neto"/>
+        <div className="fg"><label className="fl">% consumo sobre peso vivo</label>
+          <input className="fi" type="number" step="0.1" value={pct} onChange={e=>setPct(parseFloat(e.target.value)||0)}/>
+        </div>
+      </div>
+      <div style={{background:"#f0f8e0",borderRadius:8,padding:"10px 14px",marginBottom:16,fontSize:13}}>
+        <strong>Total MS/día:</strong> {totalMS} kg
+      </div>
+      <div className="stit">Raciones (a descontar)</div>
+      {raciones.map((r,i)=>(
+        <div key={i} className="fr" style={{marginBottom:8,alignItems:"center"}}>
+          <div className="fg" style={{marginBottom:0}}><label className="fl">{r.nombre} (kg/día)</label>
+            <input className="fi" type="number" step="0.1" value={r.cantidad} onChange={e=>updateRacion(i,"cantidad",e.target.value)}/>
+          </div>
+          <div className="fg" style={{marginBottom:0}}><label className="fl">% MS</label>
+            <input className="fi" type="number" step="1" value={r.pctMS} onChange={e=>updateRacion(i,"pctMS",e.target.value)}/>
+          </div>
+        </div>
+      ))}
+      <div style={{background:neto>=0?"#f0fff4":"#fff0f0",borderRadius:8,padding:"12px 14px",margin:"12px 0",fontSize:14}}>
+        <div style={{display:"flex",justifyContent:"space-between"}}>
+          <span>Total raciones MS:</span><strong>{totalRaciones} kg</strong>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+          <span style={{fontWeight:700}}>Consumo neto de pasto:</span>
+          <strong style={{color:neto>=0?"#228822":"#cc2222",fontSize:18}}>{neto} kg MS/día</strong>
+        </div>
       </div>
       <div className="fg"><label className="fl">Notas (motivo del cambio)</label>
         <input className="fi" value={notas} onChange={e=>setNotas(e.target.value)} placeholder="Ej: Ajuste nutricionista junio 2026"/>
@@ -528,7 +605,8 @@ export default function HarasApp(){
   const [rotaciones,setRotaciones]=useState(initRotaciones);
   const [lluviasGlobal,setLluviasGlobal]=useState([]);
   const [paramCrecimiento,setParamCrecimiento]=useState([]); // historial de cambios
-  const [paramConsumo,setParamConsumo]=useState([]);         // historial de cambios
+  const [paramConsumo,setParamConsumo]=useState([]);
+  const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
   // Current effective values (latest entry per cultivo/mes or categoria)
   const [tasasActivas,setTasasActivas]=useState({...TASAS_CRECIMIENTO});
   const [consumosActivos,setConsumosActivos]=useState({...CONSUMO_CATEGORIA});
@@ -1455,16 +1533,26 @@ export default function HarasApp(){
                 <div className="card" style={{marginBottom:20}}>
                   <div className="ct">🐴 Consumo neto de pasto por categoría (kg MS / día)</div>
                   <table className="table">
-                    <thead><tr><th>Categoría</th><th>Consumo neto</th><th>Último cambio</th><th>Notas</th></tr></thead>
+                    <thead><tr><th>Categoría</th><th>Peso (kg)</th><th>% consumo</th><th>Total MS</th><th>Raciones</th><th>Neto pasto</th><th>Últ. cambio</th></tr></thead>
                     <tbody>
-                      {Object.keys(consumosActivos).map(cat=>(
-                        <tr key={cat}>
-                          <td><strong>{cat}</strong></td>
-                          <td className="tg" style={{fontWeight:700}}>{consumosActivos[cat]} kg MS/día</td>
-                          <td className="tm txs">{(()=>{const last=paramConsumo.filter(p=>p.categoria.toLowerCase()===cat).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?fmt(last.fecha_cambio):"—";})()}</td>
-                          <td className="tm txs">{(()=>{const last=paramConsumo.filter(p=>p.categoria.toLowerCase()===cat).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?last.notas||"—":"—";})()}</td>
-                        </tr>
-                      ))}
+                      {Object.keys(CONSUMO_DETALLE_INIT).map(cat=>{
+                        const d=consumoDetalle[cat]||CONSUMO_DETALLE_INIT[cat];
+                        const total=Math.round(d.peso*d.pctConsumo/100*10)/10;
+                        const rac=Math.round((d.raciones||[]).reduce((s,r)=>s+(r.cantidad*(r.pctMS/100)),0)*10)/10;
+                        const neto=Math.round((total-rac)*10)/10;
+                        const last=paramConsumo.filter(p=>p.categoria===cat).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];
+                        return(
+                          <tr key={cat}>
+                            <td><strong>{cat}</strong></td>
+                            <td>{d.peso} kg</td>
+                            <td>{d.pctConsumo}%</td>
+                            <td>{total} kg</td>
+                            <td className="tm txs">{(d.raciones||[]).map(r=>`${r.nombre}: ${r.cantidad}kg (${r.pctMS}%MS)`).join(" | ")}</td>
+                            <td className="tg" style={{fontWeight:700}}>{neto} kg MS/d</td>
+                            <td className="tm txs">{last?fmt(last.fecha_cambio):"—"}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                   <button className="btn bp" style={{marginTop:16}} onClick={()=>setModal("editConsumo")}>✏️ Modificar consumo</button>
@@ -1667,7 +1755,7 @@ export default function HarasApp(){
           <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
             <div className="md" style={{maxWidth:460}}>
               <div className="mtit">Modificar consumo por categoría</div>
-              <EditConsumoForm consumosActivos={consumosActivos} setConsumosActivos={setConsumosActivos} paramConsumo={paramConsumo} setParamConsumo={setParamConsumo} closeModal={closeModal} sbUpsert={sbUpsert} hoy={hoy}/>
+              <EditConsumoForm consumosActivos={consumosActivos} setConsumosActivos={setConsumosActivos} consumoDetalle={consumoDetalle} setConsumoDetalle={setConsumoDetalle} paramConsumo={paramConsumo} setParamConsumo={setParamConsumo} closeModal={closeModal} sbUpsert={sbUpsert} hoy={hoy}/>
             </div>
           </div>
         )}
