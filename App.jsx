@@ -4,11 +4,12 @@ const SUPABASE_URL = "https://xmiygmcczqlvovdwlfov.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXlnbWNjenFsdm92ZHdsZm92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjQwOTIsImV4cCI6MjA5NDM0MDA5Mn0._Fp6Ah-pg2Kp9qbemzNZJ7RQj6w34WJRZsWNvVDtYJA";
 
 async function sbFetch(table, method="GET", body=null, filters="") {
+  const token = getStoredToken() || SUPABASE_KEY;
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filters}`, {
     method,
     headers: {
       "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
       "Prefer": method==="POST"?"return=representation":"",
     },
@@ -18,6 +19,39 @@ async function sbFetch(table, method="GET", body=null, filters="") {
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
+
+// ── Auth helpers ──────────────────────────────────────────────────────────
+async function signIn(email, password){
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({email,password}),
+  });
+  const data = await res.json();
+  if(data.access_token){
+    localStorage.setItem("sb_token", data.access_token);
+    localStorage.setItem("sb_user", JSON.stringify({email:data.user?.email, id:data.user?.id}));
+    return {ok:true, user:data.user};
+  }
+  return {ok:false, error:data.error_description||"Error al iniciar sesión"};
+}
+
+async function signOut(){
+  const token = localStorage.getItem("sb_token");
+  if(token){
+    await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${token}`},
+    });
+  }
+  localStorage.removeItem("sb_token");
+  localStorage.removeItem("sb_user");
+}
+
+function getStoredUser(){
+  try{ return JSON.parse(localStorage.getItem("sb_user")); } catch{ return null; }
+}
+function getStoredToken(){ return localStorage.getItem("sb_token"); }
 
 async function sbSelect(table) {
   const order = table==="lluvias_campo" ? "fecha" : "id";
@@ -781,6 +815,11 @@ function EditConsumoForm({consumosActivos,setConsumosActivos,consumoDetalle,setC
 }
 
 export default function HarasApp(){
+  const [user,setUser]=useState(getStoredUser());
+  const [loginEmail,setLoginEmail]=useState("");
+  const [loginPassword,setLoginPassword]=useState("");
+  const [loginError,setLoginError]=useState("");
+  const [loginLoading,setLoginLoading]=useState(false);
   const [view,setView]=useState("dashboard");
   const [sidebarOpen,setSidebarOpen]=useState(true);
   const [lotes,setLotes]=useState(initLotes);
@@ -825,6 +864,23 @@ export default function HarasApp(){
   },[]);
 
   // Push history when view changes
+  async function handleLogin(){
+    if(!loginEmail||!loginPassword) return;
+    setLoginLoading(true); setLoginError("");
+    const result = await signIn(loginEmail, loginPassword);
+    if(result.ok){
+      setUser(getStoredUser());
+    } else {
+      setLoginError(result.error||"Email o contraseña incorrectos");
+    }
+    setLoginLoading(false);
+  }
+
+  async function handleLogout(){
+    await signOut();
+    setUser(null);
+  }
+
   function navigate(newView, newLote=null){
     setView(newView);
     setSelLote(newLote);
@@ -1242,6 +1298,30 @@ export default function HarasApp(){
 
   const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"},{id:"movimientos",ic:"⇄",lb:"Movimientos"}];
 
+  if(!user) return(
+    <div style={{minHeight:"100vh",background:"#f5f5f0",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <style>{css}</style>
+      <div style={{background:"#fff",borderRadius:16,padding:40,width:"100%",maxWidth:380,boxShadow:"0 4px 24px rgba(0,0,0,.1)"}}>
+        <div style={{textAlign:"center",marginBottom:32}}>
+          <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#8B6000",fontWeight:700,marginBottom:4}}>Haras Manager</div>
+          <div style={{fontSize:13,color:"#888"}}>Ingresá con tu cuenta</div>
+        </div>
+        <div className="fg"><label className="fl">Email</label>
+          <input className="fi" type="email" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="tu@email.com"/>
+        </div>
+        <div className="fg"><label className="fl">Contraseña</label>
+          <input className="fi" type="password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="••••••••"
+            onKeyDown={e=>e.key==="Enter"&&handleLogin()}/>
+        </div>
+        {loginError&&<div style={{color:"#cc2222",fontSize:13,marginBottom:12,fontWeight:600}}>{loginError}</div>}
+        <button className="btn bp" style={{width:"100%",justifyContent:"center",padding:"12px",fontSize:15}}
+          disabled={loginLoading} onClick={handleLogin}>
+          {loginLoading?"Ingresando…":"Ingresar"}
+        </button>
+      </div>
+    </div>
+  );
+
   return(
     <>
       <style>{css}</style>
@@ -1265,7 +1345,12 @@ export default function HarasApp(){
           </div>
           <div className="nsec" style={{marginTop:"auto",borderTop:"1px solid var(--bb)",paddingTop:16}}>
             <div className="nlbl">Resumen</div>
-            <div style={{padding:"8px 12px 4px",fontSize:11,color:dbConnected?"#4caf6e":"#7a6a50"}}>
+            <div style={{padding:"8px 12px 4px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontSize:11,color:dbConnected?"#4caf6e":"#7a6a50"}}>{dbConnected?"● Conectada":"○ Local"}</span>
+            <button onClick={handleLogout} style={{fontSize:11,color:"#cc2222",background:"none",border:"none",cursor:"pointer",fontWeight:600}}>Salir</button>
+          </div>
+          <div style={{padding:"2px 12px 8px",fontSize:11,color:"#888"}}>{user?.email}</div>
+          <div style={{padding:"0px 12px 4px",fontSize:11,color:dbConnected?"#4caf6e":"#7a6a50"}}>
             {dbConnected?"● Base de datos conectada":"○ Datos locales"}
           </div>
           <div style={{padding:"4px 12px",fontSize:13,color:"#a89070"}}>
