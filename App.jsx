@@ -100,13 +100,16 @@ function getEmoji(cultivo){
   return "🌱";
 }
 
-function getTasaCrecimiento(cultivo, mes){
-  if(!cultivo) return null;
+function getTasaCrecimientoFromObj(tasas, cultivo, mes){
+  if(!cultivo||!tasas) return null;
   const c = cultivo.toLowerCase();
-  for(const key of Object.keys(TASAS_CRECIMIENTO)){
-    if(c.includes(key)) return TASAS_CRECIMIENTO[key][mes] || null;
+  for(const key of Object.keys(tasas)){
+    if(c.includes(key)) return tasas[key][mes] || null;
   }
   return null;
+}
+function getTasaCrecimiento(cultivo, mes){
+  return getTasaCrecimientoFromObj(TASAS_CRECIMIENTO, cultivo, mes);
 }
 
 function getDisponibilidadDiaria(lote){
@@ -421,6 +424,102 @@ body{font-family:'DM Sans',sans-serif;background:#f5f5f0;color:#111111;min-heigh
 .search-input:focus{border-color:var(--gold)}
 `;
 
+// ── Edit Tasa Form Component ──────────────────────────────────────────────
+function EditTasaForm({tasasActivas,setTasasActivas,paramCrecimiento,setParamCrecimiento,closeModal,sbUpsert,hoy}){
+  const meses = [{n:5,l:"Mayo"},{n:6,l:"Junio"}];
+  const cultivos = Object.keys(tasasActivas);
+  const [cultivo,setCultivo]=useState(cultivos[0]);
+  const [mes,setMes]=useState(5);
+  const [valor,setValor]=useState("");
+  const [notas,setNotas]=useState("");
+
+  function save(){
+    if(!valor) return;
+    const nuevaTasa=parseFloat(valor);
+    // Update active tasas
+    setTasasActivas(prev=>{
+      const updated={...prev};
+      if(!updated[cultivo]) updated[cultivo]={};
+      updated[cultivo][mes]=nuevaTasa;
+      return updated;
+    });
+    // Save to historial
+    const newEntry={id:"TC"+Date.now(),cultivo,mes,tasa:nuevaTasa,fecha_cambio:hoy(),notas};
+    setParamCrecimiento(prev=>[...prev,newEntry]);
+    sbUpsert("parametros_crecimiento",[{id:newEntry.id,cultivo,mes,tasa:nuevaTasa,fecha_cambio:newEntry.fecha_cambio,notas:notas||null}]);
+    closeModal();
+  }
+
+  return(
+    <div>
+      <div className="fg"><label className="fl">Cultivo</label>
+        <select className="fi" value={cultivo} onChange={e=>setCultivo(e.target.value)}>
+          {cultivos.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+      <div className="fg"><label className="fl">Mes</label>
+        <select className="fi" value={mes} onChange={e=>setMes(parseInt(e.target.value))}>
+          {meses.map(m=><option key={m.n} value={m.n}>{m.l}</option>)}
+        </select>
+      </div>
+      <div className="fg"><label className="fl">Valor actual</label>
+        <div style={{padding:"8px 12px",background:"#f0f8e0",borderRadius:8,fontSize:13,color:"#2d5a00",fontWeight:700,marginBottom:8}}>
+          Actual: {tasasActivas[cultivo]?.[mes] || "—"} kg/ha/día
+        </div>
+        <input className="fi" type="number" step="0.5" value={valor} onChange={e=>setValor(e.target.value)} placeholder="Nuevo valor"/>
+      </div>
+      <div className="fg"><label className="fl">Notas (motivo del cambio)</label>
+        <input className="fi" value={notas} onChange={e=>setNotas(e.target.value)} placeholder="Ej: Revisión nutricionista mayo 2026"/>
+      </div>
+      <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
+        <button className="btn bg" onClick={closeModal}>Cancelar</button>
+        <button className="btn bp" onClick={save}>Guardar cambio</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Edit Consumo Form Component ────────────────────────────────────────────
+function EditConsumoForm({consumosActivos,setConsumosActivos,paramConsumo,setParamConsumo,closeModal,sbUpsert,hoy}){
+  const categorias = Object.keys(consumosActivos);
+  const [categoria,setCategoria]=useState(categorias[0]);
+  const [valor,setValor]=useState("");
+  const [notas,setNotas]=useState("");
+
+  function save(){
+    if(!valor) return;
+    const nuevoConsumo=parseFloat(valor);
+    setConsumosActivos(prev=>({...prev,[categoria]:nuevoConsumo}));
+    const newEntry={id:"CC"+Date.now(),categoria,consumo_neto:nuevoConsumo,fecha_cambio:hoy(),notas};
+    setParamConsumo(prev=>[...prev,newEntry]);
+    sbUpsert("parametros_consumo",[{id:newEntry.id,categoria,peso_kg:null,pct_consumo:null,suplementos:null,consumo_neto:nuevoConsumo,fecha_cambio:newEntry.fecha_cambio,notas:notas||null}]);
+    closeModal();
+  }
+
+  return(
+    <div>
+      <div className="fg"><label className="fl">Categoría</label>
+        <select className="fi" value={categoria} onChange={e=>setCategoria(e.target.value)}>
+          {categorias.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+      <div className="fg"><label className="fl">Valor actual</label>
+        <div style={{padding:"8px 12px",background:"#f0f8e0",borderRadius:8,fontSize:13,color:"#2d5a00",fontWeight:700,marginBottom:8}}>
+          Actual: {consumosActivos[categoria] || "—"} kg MS/día
+        </div>
+        <input className="fi" type="number" step="0.1" value={valor} onChange={e=>setValor(e.target.value)} placeholder="Nuevo valor neto"/>
+      </div>
+      <div className="fg"><label className="fl">Notas (motivo del cambio)</label>
+        <input className="fi" value={notas} onChange={e=>setNotas(e.target.value)} placeholder="Ej: Ajuste nutricionista junio 2026"/>
+      </div>
+      <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
+        <button className="btn bg" onClick={closeModal}>Cancelar</button>
+        <button className="btn bp" onClick={save}>Guardar cambio</button>
+      </div>
+    </div>
+  );
+}
+
 export default function HarasApp(){
   const [view,setView]=useState("dashboard");
   const [sidebarOpen,setSidebarOpen]=useState(true);
@@ -428,6 +527,11 @@ export default function HarasApp(){
   const [caballos,setCaballos]=useState(initCaballos);
   const [rotaciones,setRotaciones]=useState(initRotaciones);
   const [lluviasGlobal,setLluviasGlobal]=useState([]);
+  const [paramCrecimiento,setParamCrecimiento]=useState([]); // historial de cambios
+  const [paramConsumo,setParamConsumo]=useState([]);         // historial de cambios
+  // Current effective values (latest entry per cultivo/mes or categoria)
+  const [tasasActivas,setTasasActivas]=useState({...TASAS_CRECIMIENTO});
+  const [consumosActivos,setConsumosActivos]=useState({...CONSUMO_CATEGORIA});
   const [undoStack,setUndoStack]=useState([]); // [{description, undo: fn}]
 
   function pushUndo(description, undoFn){
@@ -515,6 +619,36 @@ export default function HarasApp(){
           }));
           setDbConnected(true);
         }
+        // Load parametros
+        try {
+          const crec = await sbSelect("parametros_crecimiento");
+          if(crec && crec.length>0){
+            setParamCrecimiento(crec);
+            // Apply latest value per cultivo+mes
+            const latest={};
+            crec.sort((a,b)=>a.fecha_cambio.localeCompare(b.fecha_cambio)).forEach(p=>{
+              if(!latest[p.cultivo]) latest[p.cultivo]={};
+              latest[p.cultivo][p.mes]=p.tasa;
+            });
+            setTasasActivas(prev=>{
+              const updated={...prev};
+              Object.keys(latest).forEach(c=>{
+                if(!updated[c]) updated[c]={};
+                Object.keys(latest[c]).forEach(m=>{ updated[c][m]=latest[c][m]; });
+              });
+              return updated;
+            });
+          }
+          const cons = await sbSelect("parametros_consumo");
+          if(cons && cons.length>0){
+            setParamConsumo(cons);
+            const latestCons={};
+            cons.sort((a,b)=>a.fecha_cambio.localeCompare(b.fecha_cambio)).forEach(p=>{
+              latestCons[p.categoria.toLowerCase()]=p.consumo_neto;
+            });
+            setConsumosActivos(prev=>({...prev,...latestCons}));
+          }
+        } catch(e){ console.log("parametros error:", e); }
         try {
           const intervsDb = await sbSelect("intervenciones");
           if(intervsDb && intervsDb.length>0){
@@ -806,7 +940,7 @@ export default function HarasApp(){
     closeModal();
   }
 
-  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"}];
+  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"}];
 
   return(
     <>
@@ -1291,6 +1425,77 @@ export default function HarasApp(){
             </>
           )}
 
+          {/* PARAMETROS */}
+          {view==="parametros"&&(
+            <>
+              <div className="mh"><div><h2>Información Modificable</h2><p>Tasas de crecimiento y consumo por categoría</p></div></div>
+              <div className="cnt">
+
+                {/* Tasas de crecimiento */}
+                <div className="card" style={{marginBottom:20}}>
+                  <div className="ct">🌿 Tasas de crecimiento (kg MS / ha / día)</div>
+                  <table className="table">
+                    <thead><tr><th>Cultivo</th><th>Mayo</th><th>Junio</th><th>Último cambio</th><th>Notas</th></tr></thead>
+                    <tbody>
+                      {Object.keys(tasasActivas).map(cultivo=>(
+                        <tr key={cultivo}>
+                          <td><strong>{cultivo}</strong></td>
+                          <td className="tg" style={{fontWeight:700}}>{tasasActivas[cultivo][5]}</td>
+                          <td className="tg" style={{fontWeight:700}}>{tasasActivas[cultivo][6]}</td>
+                          <td className="tm txs">{(()=>{const last=paramCrecimiento.filter(p=>p.cultivo===cultivo).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?fmt(last.fecha_cambio):"—";})()}</td>
+                          <td className="tm txs">{(()=>{const last=paramCrecimiento.filter(p=>p.cultivo===cultivo).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?last.notas||"—":"—";})()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button className="btn bp" style={{marginTop:16}} onClick={()=>setModal("editTasa")}>✏️ Modificar tasa</button>
+                </div>
+
+                {/* Consumo por categoría */}
+                <div className="card" style={{marginBottom:20}}>
+                  <div className="ct">🐴 Consumo neto de pasto por categoría (kg MS / día)</div>
+                  <table className="table">
+                    <thead><tr><th>Categoría</th><th>Consumo neto</th><th>Último cambio</th><th>Notas</th></tr></thead>
+                    <tbody>
+                      {Object.keys(consumosActivos).map(cat=>(
+                        <tr key={cat}>
+                          <td><strong>{cat}</strong></td>
+                          <td className="tg" style={{fontWeight:700}}>{consumosActivos[cat]} kg MS/día</td>
+                          <td className="tm txs">{(()=>{const last=paramConsumo.filter(p=>p.categoria.toLowerCase()===cat).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?fmt(last.fecha_cambio):"—";})()}</td>
+                          <td className="tm txs">{(()=>{const last=paramConsumo.filter(p=>p.categoria.toLowerCase()===cat).sort((a,b)=>b.fecha_cambio.localeCompare(a.fecha_cambio))[0];return last?last.notas||"—":"—";})()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button className="btn bp" style={{marginTop:16}} onClick={()=>setModal("editConsumo")}>✏️ Modificar consumo</button>
+                </div>
+
+                {/* Historial */}
+                <div className="card">
+                  <div className="ct">📋 Historial de cambios</div>
+                  <table className="table">
+                    <thead><tr><th>Fecha</th><th>Tipo</th><th>Detalle</th><th>Valor anterior</th><th>Valor nuevo</th><th>Notas</th></tr></thead>
+                    <tbody>
+                      {[...paramCrecimiento.map(p=>({fecha:p.fecha_cambio,tipo:"Crecimiento",detalle:`${p.cultivo} · mes ${p.mes}`,valorNuevo:`${p.tasa} kg/ha/d`,notas:p.notas||""})),
+                        ...paramConsumo.map(p=>({fecha:p.fecha_cambio,tipo:"Consumo",detalle:p.categoria,valorNuevo:`${p.consumo_neto} kg MS/d`,notas:p.notas||""}))
+                      ].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map((h,i)=>(
+                        <tr key={i}>
+                          <td>{fmt(h.fecha)}</td>
+                          <td><span className="badge">{h.tipo}</span></td>
+                          <td><strong>{h.detalle}</strong></td>
+                          <td className="tm">—</td>
+                          <td className="tg" style={{fontWeight:700}}>{h.valorNuevo}</td>
+                          <td className="tm">{h.notas}</td>
+                        </tr>
+                      ))}
+                      {paramCrecimiento.length===0&&paramConsumo.length===0&&<tr><td colSpan={6}><div className="es">Sin cambios registrados aún</div></td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* ROTACIONES */}
           {view==="rotaciones"&&(
             <>
@@ -1448,6 +1653,24 @@ export default function HarasApp(){
             </div>
           </div>
         )}
+        {/* MODAL: Editar Tasa */}
+        {modal==="editTasa"&&(
+          <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
+            <div className="md" style={{maxWidth:460}}>
+              <div className="mtit">Modificar tasa de crecimiento</div>
+              <EditTasaForm tasasActivas={tasasActivas} setTasasActivas={setTasasActivas} paramCrecimiento={paramCrecimiento} setParamCrecimiento={setParamCrecimiento} closeModal={closeModal} sbUpsert={sbUpsert} hoy={hoy}/>
+            </div>
+          </div>
+        )}
+        {/* MODAL: Editar Consumo */}
+        {modal==="editConsumo"&&(
+          <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
+            <div className="md" style={{maxWidth:460}}>
+              <div className="mtit">Modificar consumo por categoría</div>
+              <EditConsumoForm consumosActivos={consumosActivos} setConsumosActivos={setConsumosActivos} paramConsumo={paramConsumo} setParamConsumo={setParamConsumo} closeModal={closeModal} sbUpsert={sbUpsert} hoy={hoy}/>
+            </div>
+          </div>
+        )}
         {/* MODAL: Rotación */}
         {modal==="rot"&&(
           <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
@@ -1468,16 +1691,6 @@ export default function HarasApp(){
               <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
                 <button className="btn bg" onClick={closeModal}>Cancelar</button>
                 <button className="btn bp" onClick={saveRot}>Registrar</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </>
-  );
-}
-
               </div>
             </div>
           </div>
