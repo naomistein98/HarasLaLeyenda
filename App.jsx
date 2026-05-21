@@ -456,6 +456,189 @@ const CONSUMO_DETALLE_INIT = {
   },
 };
 
+// ── Movimiento Modal Component ────────────────────────────────────────────
+function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,hoy}){
+  const [paso,setPaso]=useState(1);
+  const [cantidad,setCantidad]=useState("");
+  const [categoria,setCategoria]=useState("");
+  const [tieneNombre,setTieneNombre]=useState(null); // true | false
+  const [busqueda,setBusqueda]=useState("");
+  const [seleccionados,setSeleccionados]=useState([]); // ids
+  const [loteOrigen,setLoteOrigen]=useState("");
+  const [loteDestino,setLoteDestino]=useState("");
+  const [fecha,setFecha]=useState(hoy());
+  const [motivo,setMotivo]=useState("");
+  const [notas,setNotas]=useState("");
+
+  const cabsFiltrados = caballos.filter(c=>{
+    const matchCat = !categoria || c.categoria.toLowerCase()===categoria.toLowerCase();
+    const matchBusq = !busqueda || c.nombre.toLowerCase().includes(busqueda.toLowerCase());
+    return matchCat && matchBusq;
+  });
+
+  function toggleSel(id){
+    setSeleccionados(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
+  }
+
+  function save(){
+    if(!loteDestino) return;
+    if(tieneNombre && seleccionados.length>0){
+      // Save one movimiento per named animal
+      seleccionados.forEach(id=>{
+        const cab=caballos.find(c=>c.id===id);
+        saveMovimiento({
+          fecha, tipo:"individual",
+          caballoId:id, caballoNombre:cab?.nombre||"",
+          cantidad:1, categoria:cab?.categoria||categoria,
+          loteOrigen:loteOrigen||null, loteDestino,
+          motivo, notas,
+        });
+      });
+    } else {
+      // Save as group
+      saveMovimiento({
+        fecha, tipo:"grupo",
+        caballoId:null, caballoNombre:null,
+        cantidad:parseInt(cantidad)||1, categoria,
+        loteOrigen:loteOrigen||null, loteDestino,
+        motivo, notas,
+      });
+    }
+    closeModal();
+  }
+
+  const pasoTitle=["","1 · Cantidad y categoría","2 · ¿Tienen nombre?","3 · Seleccionar animales","4 · Lotes y fecha"][paso]||"";
+
+  return(
+    <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
+      <div className="md" style={{maxWidth:540}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+          <div className="mtit" style={{marginBottom:0,flex:1}}>Registrar movimiento</div>
+          <div style={{fontSize:12,color:"#888",fontWeight:600}}>{pasoTitle}</div>
+        </div>
+
+        {/* Paso 1: Cantidad y categoría */}
+        {paso===1&&(
+          <div>
+            <div className="fr">
+              <div className="fg">
+                <label className="fl">Cantidad de animales *</label>
+                <input className="fi" type="number" min="1" value={cantidad} onChange={e=>setCantidad(e.target.value)} placeholder="Ej: 6"/>
+              </div>
+              <div className="fg">
+                <label className="fl">Categoría *</label>
+                <select className="fi" value={categoria} onChange={e=>setCategoria(e.target.value)}>
+                  <option value="">— Seleccionar —</option>
+                  {CATEGORIAS.map(c=><option key={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
+              <button className="btn bg" onClick={closeModal}>Cancelar</button>
+              <button className="btn bp" disabled={!cantidad||!categoria} onClick={()=>setPaso(2)}>Siguiente →</button>
+            </div>
+          </div>
+        )}
+
+        {/* Paso 2: ¿Tienen nombre? */}
+        {paso===2&&(
+          <div>
+            <div style={{marginBottom:16,fontSize:14,color:"#333",fontWeight:600}}>
+              ¿Los {cantidad} {categoria} que se mueven tienen nombre registrado en el sistema?
+            </div>
+            <div className="cg" style={{marginBottom:24}}>
+              <label className={`ci ${tieneNombre===true?"ck":""}`} style={{padding:"14px 20px",fontSize:14}}>
+                <input type="radio" onChange={()=>setTieneNombre(true)}/> Sí, tienen nombre
+              </label>
+              <label className={`ci ${tieneNombre===false?"ck":""}`} style={{padding:"14px 20px",fontSize:14}}>
+                <input type="radio" onChange={()=>setTieneNombre(false)}/> No, sin nombre
+              </label>
+            </div>
+            <div className="fb g2p" style={{justifyContent:"space-between"}}>
+              <button className="btn bg" onClick={()=>setPaso(1)}>← Atrás</button>
+              <button className="btn bp" disabled={tieneNombre===null} onClick={()=>setPaso(tieneNombre?3:4)}>Siguiente →</button>
+            </div>
+          </div>
+        )}
+
+        {/* Paso 3: Seleccionar por nombre */}
+        {paso===3&&(
+          <div>
+            <div className="fg">
+              <label className="fl">Buscar animal</label>
+              <input className="fi" value={busqueda} onChange={e=>setBusqueda(e.target.value)} placeholder="Escribí el nombre…"/>
+            </div>
+            <div style={{fontSize:12,color:"#888",marginBottom:8}}>{seleccionados.length} seleccionados de {cantidad} a mover</div>
+            <div style={{maxHeight:260,overflowY:"auto",border:"1px solid #e0ddd8",borderRadius:8,padding:8}}>
+              {cabsFiltrados.length===0
+                ?<div style={{padding:16,color:"#aaa",textAlign:"center"}}>Sin coincidencias</div>
+                :cabsFiltrados.map(c=>(
+                  <label key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:6,cursor:"pointer",background:seleccionados.includes(c.id)?"#f0f8e8":"transparent",marginBottom:2}}>
+                    <input type="checkbox" checked={seleccionados.includes(c.id)} onChange={()=>toggleSel(c.id)}/>
+                    <div>
+                      <div style={{fontWeight:600,fontSize:13}}>{c.nombre}</div>
+                      <div style={{fontSize:11,color:"#888"}}>{c.categoria} · {lotes.find(l=>l.id===c.loteId)?.nombre||"Sin lote"}</div>
+                    </div>
+                  </label>
+                ))
+              }
+            </div>
+            <div className="fb g2p" style={{marginTop:16,justifyContent:"space-between"}}>
+              <button className="btn bg" onClick={()=>setPaso(2)}>← Atrás</button>
+              <button className="btn bp" disabled={seleccionados.length===0} onClick={()=>setPaso(4)}>Siguiente → ({seleccionados.length})</button>
+            </div>
+          </div>
+        )}
+
+        {/* Paso 4: Lotes y fecha */}
+        {paso===4&&(
+          <div>
+            <div className="fr">
+              <div className="fg">
+                <label className="fl">Lote origen</label>
+                <select className="fi" value={loteOrigen} onChange={e=>setLoteOrigen(e.target.value)}>
+                  <option value="">— Ingreso nuevo al campo —</option>
+                  {lotes.map(l=><option key={l.id} value={l.id}>{l.nombre}</option>)}
+                </select>
+              </div>
+              <div className="fg">
+                <label className="fl">Lote destino *</label>
+                <select className="fi" value={loteDestino} onChange={e=>setLoteDestino(e.target.value)}>
+                  <option value="">— Seleccionar —</option>
+                  {lotes.map(l=><option key={l.id} value={l.id}>{l.nombre}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="fg">
+              <label className="fl">Fecha</label>
+              <input className="fi" type="date" value={fecha} onChange={e=>setFecha(e.target.value)}/>
+            </div>
+            <div className="fg">
+              <label className="fl">Motivo</label>
+              <input className="fi" value={motivo} onChange={e=>setMotivo(e.target.value)} placeholder="Ej: Rotación planificada, destete, sobrepastoreo…"/>
+            </div>
+            <div className="fg">
+              <label className="fl">Notas</label>
+              <input className="fi" value={notas} onChange={e=>setNotas(e.target.value)} placeholder="Observaciones adicionales"/>
+            </div>
+            {/* Resumen */}
+            <div style={{background:"#f5f9f0",borderRadius:8,padding:"10px 14px",marginBottom:16,fontSize:13}}>
+              <div style={{fontWeight:700,marginBottom:4}}>Resumen:</div>
+              <div>{tieneNombre?`${seleccionados.length} animales seleccionados`:`${cantidad} ${categoria} sin nombre`}</div>
+              {loteOrigen&&<div>Desde: <strong>{lotes.find(l=>l.id===loteOrigen)?.nombre}</strong></div>}
+              <div>Hacia: <strong>{lotes.find(l=>l.id===loteDestino)?.nombre||"—"}</strong></div>
+            </div>
+            <div className="fb g2p" style={{justifyContent:"space-between"}}>
+              <button className="btn bg" onClick={()=>setPaso(tieneNombre?3:2)}>← Atrás</button>
+              <button className="btn bp" disabled={!loteDestino} onClick={save}>✓ Registrar movimiento</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Edit Tasa Form Component ──────────────────────────────────────────────
 function EditTasaForm({tasasActivas,setTasasActivas,paramCrecimiento,setParamCrecimiento,closeModal,sbUpsert,hoy}){
   const meses = [{n:5,l:"Mayo"},{n:6,l:"Junio"}];
@@ -606,6 +789,7 @@ export default function HarasApp(){
   const [lluviasGlobal,setLluviasGlobal]=useState([]);
   const [paramCrecimiento,setParamCrecimiento]=useState([]); // historial de cambios
   const [paramConsumo,setParamConsumo]=useState([]);
+  const [movimientos,setMovimientos]=useState([]);
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
   // Current effective values (latest entry per cultivo/mes or categoria)
   const [tasasActivas,setTasasActivas]=useState({...TASAS_CRECIMIENTO});
@@ -727,6 +911,10 @@ export default function HarasApp(){
             setConsumosActivos(prev=>({...prev,...latestCons}));
           }
         } catch(e){ console.log("parametros error:", e); }
+        try {
+          const movsDb = await sbSelect("movimientos");
+          if(movsDb && movsDb.length>0) setMovimientos(movsDb.map(m=>({...m,loteOrigen:m.lote_origen,loteDestino:m.lote_destino,caballoId:m.caballo_id,caballoNombre:m.caballo_nombre})));
+        } catch(e){ console.log("movimientos error:", e); }
         try {
           const intervsDb = await sbSelect("intervenciones");
           if(intervsDb && intervsDb.length>0){
@@ -962,6 +1150,23 @@ export default function HarasApp(){
     });
   }
 
+  function saveMovimiento(mov){
+    const newMov={...mov, id:"MOV"+Date.now()};
+    setMovimientos(prev=>[...prev,newMov]);
+    // Update caballos loteId if named animal
+    if(newMov.caballoId){
+      setCaballos(prev=>prev.map(c=>c.id===newMov.caballoId?{...c,loteId:newMov.loteDestino,fechaIngreso:newMov.fecha}:c));
+      saveCaballoToDb({...caballos.find(c=>c.id===newMov.caballoId),loteId:newMov.loteDestino,fechaIngreso:newMov.fecha});
+    }
+    sbUpsert("movimientos",[{
+      id:newMov.id, fecha:newMov.fecha, tipo:newMov.tipo,
+      caballo_id:newMov.caballoId||null, caballo_nombre:newMov.caballoNombre||null,
+      cantidad:newMov.cantidad||null, categoria:newMov.categoria||null,
+      lote_origen:newMov.loteOrigen||null, lote_destino:newMov.loteDestino||null,
+      motivo:newMov.motivo||null, notas:newMov.notas||null,
+    }]);
+  }
+
   function saveDesm(){
     if(!desmPid)return;
     const newD={id:"D"+Date.now(),loteId:desmPid,fecha:fD.fecha,notas:fD.notas};
@@ -1018,7 +1223,7 @@ export default function HarasApp(){
     closeModal();
   }
 
-  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"}];
+  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"},{id:"movimientos",ic:"⇄",lb:"Movimientos"}];
 
   return(
     <>
@@ -1404,6 +1609,33 @@ export default function HarasApp(){
                       </div>
                     );
                   })()}
+                  {/* Historial de Movimientos del lote */}
+                  {(()=>{
+                    const movsLote=[...movimientos.filter(m=>m.loteOrigen===l.id||m.loteDestino===l.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                    if(!movsLote.length) return null;
+                    return(
+                      <div className="card" style={{marginBottom:20}}>
+                        <div className="stit">Historial de movimientos</div>
+                        <table className="table">
+                          <thead><tr><th>Fecha</th><th>Animal</th><th>Tipo</th><th>Desde/Hacia</th><th>Motivo</th></tr></thead>
+                          <tbody>{movsLote.map(m=>{
+                            const esEntrada=m.loteDestino===l.id;
+                            const otroLoteId=esEntrada?m.loteOrigen:m.loteDestino;
+                            const otroLote=lotes.find(x=>x.id===otroLoteId);
+                            return(
+                              <tr key={m.id}>
+                                <td>{fmt(m.fecha)}</td>
+                                <td><strong>{m.caballoNombre||(m.cantidad>1?`${m.cantidad} ${m.categoria||"animales"}`:m.categoria||"—")}</strong></td>
+                                <td><span className={`badge ${esEntrada?"g":"o"}`}>{esEntrada?"↓ Entrada":"↑ Salida"}</span></td>
+                                <td>{otroLote?<button style={{background:"none",border:"none",cursor:"pointer",color:"#8B6000",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",otroLoteId)}>{otroLote.nombre}</button>:"—"}</td>
+                                <td className="tm">{m.motivo||"—"}</td>
+                              </tr>
+                            );
+                          })}</tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
                   {/* Historial de Siembras */}
                   {SIEMBRAS[l.id]&&(
                     <div className="card" style={{marginBottom:20}}>
@@ -1498,8 +1730,46 @@ export default function HarasApp(){
                               <td style={{maxWidth:180}}>{c.alimentos.map(a=><span key={a} className="tag">{a}</span>)}</td>
                               <td><div className="fb g2p">
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
+                                <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Historial</button>
                                 <button className="btn bd2 sm" onClick={()=>delCab(c.id)}>✕</button>
                               </div></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  }
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* MOVIMIENTOS */}
+          {view==="movimientos"&&(
+            <>
+              <div className="mh">
+                <div><h2>Movimientos</h2><p>{movimientos.length} registros</p></div>
+                <button className="btn bp" onClick={()=>setModal("movimiento")}>+ Registrar movimiento</button>
+              </div>
+              <div className="cnt">
+                <div className="card">
+                  {movimientos.length===0
+                    ?<div className="es">Sin movimientos registrados aún.</div>
+                    :<table className="table">
+                      <thead><tr><th>Fecha</th><th>Animal</th><th>Categoría</th><th>Cant.</th><th>Origen</th><th>Destino</th><th>Motivo</th></tr></thead>
+                      <tbody>
+                        {[...movimientos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(m=>{
+                          const ori=lotes.find(l=>l.id===m.loteOrigen);
+                          const dst=lotes.find(l=>l.id===m.loteDestino);
+                          return(
+                            <tr key={m.id}>
+                              <td>{fmt(m.fecha)}</td>
+                              <td><strong>{m.caballoNombre||"Grupo sin nombre"}</strong></td>
+                              <td><span className="badge">{m.categoria||"—"}</span></td>
+                              <td>{m.cantidad||1}</td>
+                              <td>{ori?<button style={{background:"none",border:"none",cursor:"pointer",color:"#8B6000",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteOrigen)}>{ori.nombre}</button>:"—"}</td>
+                              <td>{dst?<button style={{background:"none",border:"none",cursor:"pointer",color:"#228822",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteDestino)}>{dst.nombre}</button>:"—"}</td>
+                              <td className="tm">{m.motivo||"—"}</td>
                             </tr>
                           );
                         })}
@@ -1735,6 +2005,47 @@ export default function HarasApp(){
             </div>
           </div>
         )}
+        {/* MODAL: Movimiento */}
+        {modal==="movimiento"&&(()=>{
+          const EM={fecha:hoy(),tipo:"individual",caballoId:"",caballoNombre:"",cantidad:1,categoria:CATEGORIAS[0],loteOrigen:"",loteDestino:"",motivo:"",notas:""};
+          return(
+            <MovimientoModal lotes={lotes} caballos={caballos} CATEGORIAS={CATEGORIAS} saveMovimiento={saveMovimiento} closeModal={closeModal} hoy={hoy}/>
+          );
+        })()}
+        {/* MODAL: Historial caballo */}
+        {modal==="histCaballo"&&editId&&(()=>{
+          const cab=caballos.find(c=>c.id===editId);
+          if(!cab) return null;
+          const movsC=[...movimientos.filter(m=>m.caballoId===editId)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+          return(
+            <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
+              <div className="md" style={{maxWidth:580}}>
+                <div className="mtit">Historial de {cab.nombre}</div>
+                {movsC.length===0
+                  ?<div className="es">Sin movimientos registrados para este caballo.</div>
+                  :<table className="table">
+                    <thead><tr><th>Fecha</th><th>Origen</th><th>Destino</th><th>Motivo</th></tr></thead>
+                    <tbody>{movsC.map(m=>{
+                      const ori=lotes.find(l=>l.id===m.loteOrigen);
+                      const dst=lotes.find(l=>l.id===m.loteDestino);
+                      return(
+                        <tr key={m.id}>
+                          <td>{fmt(m.fecha)}</td>
+                          <td className="tm">{ori?ori.nombre:"—"}</td>
+                          <td style={{fontWeight:700,color:"#228822"}}>{dst?dst.nombre:"—"}</td>
+                          <td className="tm">{m.motivo||"—"}</td>
+                        </tr>
+                      );
+                    })}</tbody>
+                  </table>
+                }
+                <div style={{marginTop:16,textAlign:"right"}}>
+                  <button className="btn bg" onClick={closeModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
         {/* MODAL: Desmalezada */}
         {modal==="desm"&&(
           <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
