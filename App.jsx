@@ -659,6 +659,14 @@ export default function HarasApp(){
   const stats=useMemo(()=>({
     totalCabs:caballos.length,
     totalAnimales:lotes.reduce((sum,l)=>sum+stockTotal(l.id),0),
+    demandaTotal:(()=>{
+      let total=0;
+      lotes.forEach(l=>{
+        const c=getConsumoDiarioLote(l.id,caballos);
+        if(c) total+=c;
+      });
+      return Math.round(total*10)/10;
+    })(),
     totalLotes:lotes.length,
     ocup:lotes.filter(l=>stockTotal(l.id)>0).length,
     haTotal:lotes.reduce((s,l)=>s+(l.hectareas||0),0).toFixed(1),
@@ -825,8 +833,8 @@ export default function HarasApp(){
             <>
               <div className="mh"><button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button><div><h2>Panel general</h2><p>Vista consolidada del haras</p></div></div>
               <div className="cnt">
-                <div className="g3 mb4" style={{marginBottom:20}}>
-                  {[{v:stats.totalAnimales,l:"Animales en campo"},{v:stats.totalLotes,l:"Lotes totales"},{v:`${stats.haTotal} ha`,l:"Superficie total"}].map((s,i)=>(
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:16,marginBottom:20}}>
+                  {[{v:stats.totalAnimales,l:"Animales en campo"},{v:stats.totalLotes,l:"Lotes totales"},{v:`${stats.haTotal} ha`,l:"Superficie total"},{v:`${stats.demandaTotal} kg`,l:"Demanda MS/día total"}].map((s,i)=>(
                     <div key={i} className="card"><div className="sv">{s.v}</div><div className="sl">{s.l}</div></div>
                   ))}
                 </div>
