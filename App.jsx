@@ -1150,6 +1150,23 @@ export default function HarasApp(){
     });
   }
 
+  function delMovimiento(id){
+    const mov=movimientos.find(m=>m.id===id);
+    if(!mov) return;
+    setMovimientos(prev=>prev.filter(m=>m.id!==id));
+    sbDelete("movimientos",id);
+    pushUndo(`Borrar movimiento de ${mov.caballoNombre||mov.categoria||"animales"}`, ()=>{
+      setMovimientos(prev=>[...prev,mov]);
+      sbUpsert("movimientos",[{
+        id:mov.id, fecha:mov.fecha, tipo:mov.tipo,
+        caballo_id:mov.caballoId||null, caballo_nombre:mov.caballoNombre||null,
+        cantidad:mov.cantidad||null, categoria:mov.categoria||null,
+        lote_origen:mov.loteOrigen||null, lote_destino:mov.loteDestino||null,
+        motivo:mov.motivo||null, notas:mov.notas||null,
+      }]);
+    });
+  }
+
   function saveMovimiento(mov){
     const newMov={...mov, id:"MOV"+Date.now()};
     setMovimientos(prev=>[...prev,newMov]);
@@ -1756,7 +1773,7 @@ export default function HarasApp(){
                   {movimientos.length===0
                     ?<div className="es">Sin movimientos registrados aún.</div>
                     :<table className="table">
-                      <thead><tr><th>Fecha</th><th>Animal</th><th>Categoría</th><th>Cant.</th><th>Origen</th><th>Destino</th><th>Motivo</th></tr></thead>
+                      <thead><tr><th>Fecha</th><th>Animal</th><th>Categoría</th><th>Cant.</th><th>Origen</th><th>Destino</th><th>Motivo</th><th></th></tr></thead>
                       <tbody>
                         {[...movimientos].sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(m=>{
                           const ori=lotes.find(l=>l.id===m.loteOrigen);
@@ -1770,6 +1787,7 @@ export default function HarasApp(){
                               <td>{ori?<button style={{background:"none",border:"none",cursor:"pointer",color:"#8B6000",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteOrigen)}>{ori.nombre}</button>:"—"}</td>
                               <td>{dst?<button style={{background:"none",border:"none",cursor:"pointer",color:"#228822",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteDestino)}>{dst.nombre}</button>:"—"}</td>
                               <td className="tm">{m.motivo||"—"}</td>
+                              <td><button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>delMovimiento(m.id)}>✕</button></td>
                             </tr>
                           );
                         })}
