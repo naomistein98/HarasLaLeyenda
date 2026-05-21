@@ -1269,24 +1269,32 @@ export default function HarasApp(){
                       {(()=>{
                         const disp=getDisponibilidadDiaria(l);
                         const cons=getConsumoDiarioLote(l.id,caballos);
-                        if(!disp||!cons) return null;
-                        const balance=disp.kgDia-cons;
-                        const isOk=balance>=0;
+                        if(!disp) return null;
+                        const ofertaHa = disp.tasa;
+                        const ofertaTotal = disp.kgDia;
+                        const demandaTotal = cons||0;
+                        const balance = Math.round((ofertaTotal-demandaTotal)*10)/10;
+                        const isOk = balance>=0;
                         return(
-                          <div style={{marginTop:14,padding:"12px 14px",borderRadius:8,background:isOk?"#f0fff4":"#fff0f0",border:`1px solid ${isOk?"#a0e0b0":"#ffb0b0"}`}}>
-                            <div style={{fontSize:11,color:isOk?"#226622":"#992222",letterSpacing:1,textTransform:"uppercase",fontWeight:700,marginBottom:8}}>⚖️ Balance forrajero diario</div>
-                            <div className="ir" style={{padding:"4px 0"}}>
-                              <span style={{fontSize:13,color:"#333"}}>Disponible</span>
-                              <span style={{fontWeight:700,color:"#2d5a00"}}>{disp.kgDia} kg MS</span>
+                          <div style={{marginTop:14,borderRadius:8,overflow:"hidden",border:"1px solid #e0ddd8"}}>
+                            <div style={{background:"#f5f9f0",padding:"8px 14px",fontSize:11,color:"#446600",letterSpacing:1,textTransform:"uppercase",fontWeight:800}}>⚖️ Balance forrajero diario</div>
+                            <div className="ir" style={{padding:"10px 14px",borderBottom:"1px solid #f0ede8"}}>
+                              <span style={{fontSize:13,color:"#555",fontWeight:600}}>Oferta kg MS/ha</span>
+                              <span style={{fontWeight:700,color:"#2d5a00"}}>{ofertaHa} kg MS/ha</span>
                             </div>
-                            <div className="ir" style={{padding:"4px 0"}}>
-                              <span style={{fontSize:13,color:"#333"}}>Consumo ({nTotal} animales)</span>
-                              <span style={{fontWeight:700,color:"#992222"}}>{cons} kg MS</span>
+                            <div className="ir" style={{padding:"10px 14px",borderBottom:"1px solid #f0ede8"}}>
+                              <span style={{fontSize:13,color:"#555",fontWeight:600}}>Oferta total del lote</span>
+                              <span style={{fontWeight:700,color:"#2d5a00"}}>{ofertaTotal} kg MS/día</span>
                             </div>
-                            <div style={{height:1,background:"#ddd",margin:"8px 0"}}/>
-                            <div className="ir" style={{padding:"4px 0"}}>
-                              <span style={{fontSize:13,fontWeight:700,color:"#333"}}>{isOk?"Superávit":"Déficit"}</span>
-                              <span style={{fontFamily:"Playfair Display,serif",fontSize:22,fontWeight:700,color:isOk?"#228822":"#cc2222"}}>{isOk?"+":""}{Math.round(balance*10)/10} kg MS/día</span>
+                            <div style={{padding:"4px 14px",fontSize:11,color:"#aaa"}}>{disp.tasa} kg/ha × {l.hectareas} ha</div>
+                            <div className="ir" style={{padding:"10px 14px",borderBottom:"1px solid #f0ede8",borderTop:"1px solid #f0ede8",marginTop:4}}>
+                              <span style={{fontSize:13,color:"#555",fontWeight:600}}>Demanda total del lote</span>
+                              <span style={{fontWeight:700,color:"#992222"}}>{demandaTotal} kg MS/día</span>
+                            </div>
+                            {cons&&<div style={{padding:"4px 14px",fontSize:11,color:"#aaa"}}>{Math.round((cons/nTotal)*10)/10} kg/animal × {nTotal} animales</div>}
+                            <div className="ir" style={{padding:"12px 14px",background:isOk?"#f0fff4":"#fff0f0"}}>
+                              <span style={{fontSize:14,fontWeight:800,color:isOk?"#226622":"#992222"}}>{isOk?"Superávit ✓":"Déficit ⚠️"}</span>
+                              <span style={{fontFamily:"Playfair Display,serif",fontSize:24,fontWeight:700,color:isOk?"#228822":"#cc2222"}}>{isOk?"+":""}{balance} kg MS/día</span>
                             </div>
                           </div>
                         );
