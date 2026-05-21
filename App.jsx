@@ -516,6 +516,16 @@ export default function HarasApp(){
           setDbConnected(true);
         }
         try {
+          const intervsDb = await sbSelect("intervenciones");
+          if(intervsDb && intervsDb.length>0){
+            // Group by lote_id and merge into lotes
+            setLotes(prev=>prev.map(l=>{
+              const lInterv=intervsDb.filter(i=>i.lote_id===l.id).map(i=>({id:i.id,fecha:i.fecha,tipo:i.tipo,elemento:i.elemento}));
+              return lInterv.length>0?{...l,intervenciones:lInterv}:l;
+            }));
+          }
+        } catch(e){ console.log("intervenciones error:", e); }
+        try {
           const lluviasDb = await sbSelect("lluvias_campo");
           if(lluviasDb && lluviasDb.length>0){
             setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:parseFloat(l.mm)})));
@@ -764,15 +774,21 @@ export default function HarasApp(){
 
   function saveInterv(){
     if(!fI.elemento||!intervPid)return;
-    setLotes(p=>p.map(x=>x.id===intervPid?{...x,intervenciones:[...x.intervenciones,{...fI,id:"I"+Date.now()}]}:x));
+    const newI={...fI,id:"I"+Date.now()};
+    setLotes(p=>p.map(x=>x.id===intervPid?{...x,intervenciones:[...x.intervenciones,newI]}:x));
+    sbUpsert("intervenciones",[{id:newI.id,lote_id:intervPid,fecha:newI.fecha,tipo:newI.tipo,elemento:newI.elemento}]);
     closeModal();
   }
   function delInterv(lid,iid){
     const lote = lotes.find(x=>x.id===lid);
     const interv = lote?.intervenciones?.find(i=>i.id===iid);
     setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:x.intervenciones.filter(i=>i.id!==iid)}:x));
+    sbDelete("intervenciones",iid);
     pushUndo(`Borrar intervención "${interv?.elemento||""}"`, ()=>{
-      if(interv) setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:[...x.intervenciones,interv]}:x));
+      if(interv){
+        setLotes(p=>p.map(x=>x.id===lid?{...x,intervenciones:[...x.intervenciones,interv]}:x));
+        sbUpsert("intervenciones",[{id:interv.id,lote_id:lid,fecha:interv.fecha,tipo:interv.tipo,elemento:interv.elemento}]);
+      }
     });
   }
 
@@ -1452,6 +1468,16 @@ export default function HarasApp(){
               <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
                 <button className="btn bg" onClick={closeModal}>Cancelar</button>
                 <button className="btn bp" onClick={saveRot}>Registrar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </>
+  );
+}
+
               </div>
             </div>
           </div>
