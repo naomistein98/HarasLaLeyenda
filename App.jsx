@@ -65,7 +65,10 @@ async function sbSelect(table) {
   const order = table==="lluvias_campo" ? "fecha" : "id";
   return await sbFetch(table, "GET", null, `?select=*&order=${order}`);
 }
-async function sbUpsert(table, data) { return await sbFetch(table, "POST", data, "?on_conflict=id"); }
+async function sbUpsert(table, data) { 
+  const result = await sbFetch(table, "POST", data, "?on_conflict=id");
+  return result !== null ? result : null;
+}
 async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
 
 
@@ -881,6 +884,12 @@ export default function HarasApp(){
   const [loginError,setLoginError]=useState("");
   const [loginLoading,setLoginLoading]=useState(false);
   const [view,setView]=useState("dashboard");
+  const [toast,setToast]=useState(null); // {msg, type: "ok"|"error"}
+  
+  function showToast(msg, type="ok"){
+    setToast({msg,type});
+    setTimeout(()=>setToast(null), 3000);
+  }
   const [sidebarOpen,setSidebarOpen]=useState(true);
   const [lotes,setLotes]=useState(initLotes);
   const [caballos,setCaballos]=useState(initCaballos);
@@ -1055,18 +1064,28 @@ export default function HarasApp(){
           setDesmalezadas(desmalezadasDb.map(d=>({id:d.id,loteId:d.lote_id,fecha:d.fecha,notas:d.notas||""})));
         }
         if(caballosDb && caballosDb.length > 0){
-          // Merge: DB data takes priority, but keep initCaballos entries not in DB
-          const dbIds = new Set(caballosDb.map(c=>c.id));
+          // DB is source of truth - use it fully
           const dbCaballos = caballosDb.map(c=>({
             id: c.id, nombre: c.nombre, categoria: c.categoria,
             alimentos: c.alimentos || [], loteId: c.lote_id,
             fechaIngreso: c.fecha_ingreso || "", peso: c.peso || "",
             color: c.color || "",
           }));
+          // Keep initCaballos entries that aren't in DB yet (seed data)
           setCaballos(prev=>{
-            const notInDb = prev.filter(c=>!dbIds.has(c.id));
-            return [...dbCaballos, ...notInDb];
+            const dbIds = new Set(dbCaballos.map(c=>c.id));
+            const seedOnly = prev.filter(c=>!dbIds.has(c.id));
+            // Also save seed data to DB so it's there next time
+            seedOnly.forEach(c=>{
+              sbUpsert("caballos",[{
+                id:c.id, nombre:c.nombre, categoria:c.categoria,
+                alimentos:c.alimentos, lote_id:c.loteId,
+                fecha_ingreso:c.fechaIngreso||null, peso:c.peso||null, color:c.color||null,
+              }]);
+            });
+            return [...dbCaballos, ...seedOnly];
           });
+          setDbConnected(true);
         }
       } catch(e) { console.log("DB not available, using local data"); }
       setLoading(false);
@@ -1087,11 +1106,12 @@ export default function HarasApp(){
 
   // Save caballo to Supabase
   async function saveCaballoToDb(c){
-    await sbUpsert("caballos", [{
+    const result = await sbUpsert("caballos", [{
       id: c.id, nombre: c.nombre, categoria: c.categoria,
       alimentos: c.alimentos, lote_id: c.loteId,
       fecha_ingreso: c.fechaIngreso||null, peso: c.peso||null, color: c.color||null,
     }]);
+    return result;
   }
   const [selLote,setSelLote]=useState(null);
   const [modal,setModal]=useState(null);
@@ -1215,7 +1235,13 @@ export default function HarasApp(){
     const newC = editId ? {...caballos.find(c=>c.id===editId),...fC} : {...fC,id:"C"+Date.now()};
     if(editId) setCaballos(p=>p.map(c=>c.id===editId?newC:c));
     else setCaballos(p=>[...p,newC]);
-    await saveCaballoToDb(newC);
+    try {
+      const result = await saveCaballoToDb(newC);
+      if(result !== null) showToast(`✓ ${newC.nombre} guardado correctamente`);
+      else showToast(`⚠️ ${newC.nombre} se guardó localmente pero puede no sincronizarse`, "error");
+    } catch(e) {
+      showToast(`✗ Error al guardar ${newC.nombre}`, "error");
+    }
     closeModal();
   }
   function delCab(id){
@@ -1400,6 +1426,11 @@ export default function HarasApp(){
       <style>{css}</style>
       <div className="app">
         <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button>
+        {toast&&(
+          <div style={{position:"fixed",bottom:70,right:20,zIndex:400,background:toast.type==="ok"?"#228822":"#cc2222",color:"#fff",borderRadius:10,padding:"12px 20px",fontSize:13,fontWeight:700,boxShadow:"0 4px 12px rgba(0,0,0,.2)",maxWidth:300}}>
+            {toast.msg}
+          </div>
+        )}
         {undoStack.length>0&&(
           <button onClick={doUndo} style={{position:"fixed",bottom:20,right:20,zIndex:300,background:"#1a1410",color:"#fff",border:"none",borderRadius:10,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,.25)",display:"flex",alignItems:"center",gap:8}}>
             ↩ Deshacer <span style={{fontSize:11,opacity:.7}}>"{undoStack[0]?.description}"</span>
