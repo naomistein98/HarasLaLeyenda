@@ -1003,12 +1003,18 @@ export default function HarasApp(){
           setDesmalezadas(desmalezadasDb.map(d=>({id:d.id,loteId:d.lote_id,fecha:d.fecha,notas:d.notas||""})));
         }
         if(caballosDb && caballosDb.length > 0){
-          setCaballos(caballosDb.map(c=>({
+          // Merge: DB data takes priority, but keep initCaballos entries not in DB
+          const dbIds = new Set(caballosDb.map(c=>c.id));
+          const dbCaballos = caballosDb.map(c=>({
             id: c.id, nombre: c.nombre, categoria: c.categoria,
             alimentos: c.alimentos || [], loteId: c.lote_id,
             fechaIngreso: c.fecha_ingreso || "", peso: c.peso || "",
             color: c.color || "",
-          })));
+          }));
+          setCaballos(prev=>{
+            const notInDb = prev.filter(c=>!dbIds.has(c.id));
+            return [...dbCaballos, ...notInDb];
+          });
         }
       } catch(e) { console.log("DB not available, using local data"); }
       setLoading(false);
@@ -1152,12 +1158,12 @@ export default function HarasApp(){
 
   function closeModal(){setModal(null);setEditId(null);setIntervPid(null);setLluviaPid(null);setDesmPid(null);setFL(EL);setFC(EC);setFI(EI);setFLl(ELl);setFR(ER);setFD(ED);}
 
-  function saveCab(){
+  async function saveCab(){
     if(!fC.nombre||!fC.loteId)return;
     const newC = editId ? {...caballos.find(c=>c.id===editId),...fC} : {...fC,id:"C"+Date.now()};
     if(editId) setCaballos(p=>p.map(c=>c.id===editId?newC:c));
     else setCaballos(p=>[...p,newC]);
-    saveCaballoToDb(newC);
+    await saveCaballoToDb(newC);
     closeModal();
   }
   function delCab(id){
