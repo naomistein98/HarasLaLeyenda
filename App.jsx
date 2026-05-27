@@ -983,8 +983,9 @@ export default function HarasApp(){
         } catch(e){ console.log("intervenciones error:", e); }
         try {
           const lluviasDb = await fetch(`${SUPABASE_URL}/rest/v1/lluvias_campo?select=*&order=fecha`, {
-            headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${getStoredToken()||SUPABASE_KEY}`}
+            headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`}
           }).then(r=>r.json());
+          console.log("lluvias_campo loaded:", lluviasDb);
           if(Array.isArray(lluviasDb) && lluviasDb.length>0){
             setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:parseFloat(l.mm)})));
           }
@@ -1193,7 +1194,11 @@ export default function HarasApp(){
     if(!fLluviaG.mm) return;
     const nueva = {id:"LG"+Date.now(), fecha:fLluviaG.fecha, mm:parseFloat(fLluviaG.mm)};
     setLluviasGlobal(p=>[...p, nueva]);
-    sbUpsert("lluvias_campo",[{id:nueva.id, fecha:nueva.fecha, mm:nueva.mm}]);
+    fetch(`${SUPABASE_URL}/rest/v1/lluvias_campo?on_conflict=id`, {
+      method:"POST",
+      headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify([{id:nueva.id,fecha:nueva.fecha,mm:nueva.mm}])
+    });
     setFLluviaG({fecha:hoy(),mm:""});
     setShowLluviaGlobal(false);
   }
