@@ -315,37 +315,37 @@ const initCaballos = [
   cab("YM011","Taylor Rae","F7","2026-04-28",0), cab("YM012","Queen Sarah","F7","2026-04-28",0), cab("YM013","Lady Thea","F7","2026-04-28",0),
   cab("YM014","Miss Tracy Bond","F7","2026-04-28",0), cab("YM015","Tweedia","F7","2026-04-28",0), cab("YM016","Opium Ruler","F7","2026-04-28",0),
   cab("YM017","Kirshara","F7","2026-04-28",0),
-  cab("YM018","Neska Amada","R3","",262), cab("YM019","Archie Fan","SMEDIO","",265), cab("YM020","Pleasant Legends","S41","",289),
-  cab("YM021","Destiny Match","R3","",291), cab("YM022","Ishka Baja","SMEDIO","",269), cab("YM023","Issolda","S31","",325),
-  cab("YM024","Bella Y Romantica","SMEDIO","",280), cab("YM025","Shafe","R2","",304), cab("YM026","Summer Fashion","F8","2026-04-28",0),
+  {id:"YM018",nombre:"Neska Amada",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"",peso:262,color:""}, {id:"YM019",nombre:"Archie Fan",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:265,color:""}, {id:"YM020",nombre:"Pleasant Legends",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:289,color:""},
+  {id:"YM021",nombre:"Destiny Match",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"",peso:291,color:""}, {id:"YM022",nombre:"Ishka Baja",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:269,color:""}, {id:"YM023",nombre:"Issolda",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:325,color:""},
+  {id:"YM024",nombre:"Bella Y Romantica",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:280,color:""}, {id:"YM025",nombre:"Shafe",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:304,color:""}, cab("YM026","Summer Fashion","F8","2026-04-28",0),
   cab("YM027","Calma Romana","F9","2026-04-24",0), cab("YM028","Ven A Mi","F9","2026-04-24",0), cab("YM029","Abbuehl","F9","2026-04-24",0),
-  cab("YM030","Leopolda Magna","F9","2026-04-24",0), cab("YM031","Break Of Day","F9","2026-04-24",0), cab("YM032","Candy Embrujada","R2","",310),
+  cab("YM030","Leopolda Magna","F9","2026-04-24",0), cab("YM031","Break Of Day","F9","2026-04-24",0), {id:"YM032",nombre:"Candy Embrujada",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:310,color:""},
   cab("YM033","Wonderful Luck","F9","2026-04-24",0), cab("YM034","Brig","F9","2026-04-24",0), cab("YM035","Fever Tap","F9","2026-04-24",0),
-  cab("YM036","Wallapop","F9","2026-04-24",0), cab("YM037","Spuki Inc","SMEDIO","",320), cab("YM038","Summer Rae","R2","",308),
-  cab("YM039","Hai Plus","SMEDIO","",275), cab("YM040","Sumi Jo","S41","",301),
+  cab("YM036","Wallapop","F9","2026-04-24",0), {id:"YM037",nombre:"Spuki Inc",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:320,color:""}, {id:"YM038",nombre:"Summer Rae",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:308,color:""},
+  {id:"YM039",nombre:"Hai Plus",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:275,color:""}, {id:"YM040",nombre:"Sumi Jo",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:301,color:""},
   cab("YM041","Fancy Indy","A3","2026-04-08",0), cab("YM042","Sola Para Ti","A3","2026-04-08",0),
-  cab("YM043","Opera Pagliacci","R3","",302), cab("YM044","Island Moon","A2","2026-04-24",0),
-  cab("YM045","Titanium Sale","S31","",320), cab("YM046","Nayla Sam","S31","",324),
-  cab("YM047","Cala Celeste","S31","",306), cab("YM048","Champein","R2","",310), cab("YM049","Lola Chai","S31","",320),
-  cab("YM050","Carneggie Mellon","S41","",347), cab("YM051","La Unica Dama","B2","",0), cab("YM052","Accionada Cosmica","B2","",0),
-  cab("YM053","Thaddea","S31","",297), cab("YM054","Sol Y Sol","S41","",334), cab("YM055","Niquelada Rye","S31","",314),
-  cab("YM056","Indiana Catcher","SMEDIO","",290), cab("YM057","Summer Violence","R2","",302), cab("YM058","Bally Lee","S41","",319),
+  {id:"YM043",nombre:"Opera Pagliacci",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"",peso:302,color:""}, cab("YM044","Island Moon","A2","2026-04-24",0),
+  {id:"YM045",nombre:"Titanium Sale",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:320,color:""}, {id:"YM046",nombre:"Nayla Sam",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:324,color:""},
+  {id:"YM047",nombre:"Cala Celeste",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:306,color:""}, {id:"YM048",nombre:"Champein",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:310,color:""}, {id:"YM049",nombre:"Lola Chai",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:320,color:""},
+  {id:"YM050",nombre:"Carneggie Mellon",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:347,color:""}, cab("YM051","La Unica Dama","B2","",0), cab("YM052","Accionada Cosmica","B2","",0),
+  {id:"YM053",nombre:"Thaddea",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:297,color:""}, {id:"YM054",nombre:"Sol Y Sol",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:334,color:""}, {id:"YM055",nombre:"Niquelada Rye",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:314,color:""},
+  {id:"YM056",nombre:"Indiana Catcher",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:290,color:""}, {id:"YM057",nombre:"Summer Violence",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:302,color:""}, {id:"YM058",nombre:"Bally Lee",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:319,color:""},
   cab("YM059","Sandrin","B6","2026-04-24",0), cab("YM060","Carmen Embrujada","B6","2026-04-24",0), cab("YM061","Cheating Girl","B6","2026-04-24",0),
   cab("YM062","Joy Niagara","B6","2026-04-24",0), cab("YM063","Laudemio","B6","2026-04-24",0), cab("YM064","Tapitai","B6","2026-04-24",0),
   cab("YM065","Jazz Banda","B6","2026-04-24",0), cab("YM066","Financial Aid","B6","2026-04-24",0), cab("YM067","Acces Code","B6","2026-04-24",0),
-  cab("YM068","Angelic Air","B6","2026-04-24",0), cab("YM069","Christofle","B6","2026-04-24",0), cab("YM070","Wengen","R2","",320),
-  cab("YM071","Opera Lilly","R2","",289), cab("YM072","Distar","BAJO","",283), cab("YM073","La Hipnosis","B6","2026-04-24",0),
-  cab("YM074","Black Ice","SMEDIO","",314), cab("YM075","Orpen Look","S31","",325), cab("YM076","Pura Chispa","R2","",292),
+  cab("YM068","Angelic Air","B6","2026-04-24",0), cab("YM069","Christofle","B6","2026-04-24",0), {id:"YM070",nombre:"Wengen",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:320,color:""},
+  {id:"YM071",nombre:"Opera Lilly",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:289,color:""}, {id:"YM072",nombre:"Distar",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:283,color:""}, cab("YM073","La Hipnosis","B6","2026-04-24",0),
+  {id:"YM074",nombre:"Black Ice",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:314,color:""}, {id:"YM075",nombre:"Orpen Look",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:325,color:""}, {id:"YM076",nombre:"Pura Chispa",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"",peso:292,color:""},
   cab("YM077","Luminosa Candy","B6","2026-04-24",0), cab("YM078","Dona Lea","B6","2026-04-24",0), cab("YM079","Chispitas","B6","2026-04-24",0),
   cab("YM080","Swhengen","B6","2026-04-24",0), cab("YM081","Crackdown","B6","2026-04-24",0),
-  cab("YM082","Summer Freedom","SARROYO","",272), cab("YM083","Dobrinka","SARROYO","",233), cab("YM084","American Voodoo","SARROYO","",196),
-  cab("YM085","Miss Lute","BAJO","",242), cab("YM086","Tarotista","BAJO","",261), cab("YM087","Nina Berstein","SARROYO","",280),
-  cab("YM088","Calshot","B3","",0), cab("YM089","Fisher Pond","S41","",302), cab("YM090","American Girl","B3","",0),
-  cab("YM091","Ready N Waiting","BAJO","",232), cab("YM092","Salome Scent","B3","",0), cab("YM093","Chispita","S41","",305),
-  cab("YM094","Summer Force","R3","",246), cab("YM095","Miss Oasis","BAJO","",233), cab("YM096","Brangelina","BAJO","",259),
-  cab("YM097","La Busanda","SARROYO","",238), cab("YM098","Dona Bibi","BAJO","",255), cab("YM099","La Nicanora","S31","",298),
-  cab("YM100","Swiss Candy","S41","",287), cab("YM101","Fantasy In Blue","S31","",300), cab("YM102","Wild Wild Luck","R3","",259),
-  cab("YM103","Amelie Embrujada","BAJO","",262), cab("YM104","Perfect Melody","BAJO","",265), cab("YM105","Miss Shaun","BAJO","",223),
+  {id:"YM082",nombre:"Summer Freedom",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:272,color:""}, {id:"YM083",nombre:"Dobrinka",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:233,color:""}, {id:"YM084",nombre:"American Voodoo",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:196,color:""},
+  {id:"YM085",nombre:"Miss Lute",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:242,color:""}, {id:"YM086",nombre:"Tarotista",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:261,color:""}, {id:"YM087",nombre:"Nina Berstein",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:280,color:""},
+  cab("YM088","Calshot","B3","",0), {id:"YM089",nombre:"Fisher Pond",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:302,color:""}, cab("YM090","American Girl","B3","",0),
+  {id:"YM091",nombre:"Ready N Waiting",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:232,color:""}, cab("YM092","Salome Scent","B3","",0), {id:"YM093",nombre:"Chispita",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:305,color:""},
+  {id:"YM094",nombre:"Summer Force",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"",peso:246,color:""}, {id:"YM095",nombre:"Miss Oasis",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:233,color:""}, {id:"YM096",nombre:"Brangelina",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:259,color:""},
+  {id:"YM097",nombre:"La Busanda",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:238,color:""}, {id:"YM098",nombre:"Dona Bibi",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:255,color:""}, {id:"YM099",nombre:"La Nicanora",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:298,color:""},
+  {id:"YM100",nombre:"Swiss Candy",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"",peso:287,color:""}, {id:"YM101",nombre:"Fantasy In Blue",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"",peso:300,color:""}, {id:"YM102",nombre:"Wild Wild Luck",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"",peso:259,color:""},
+  {id:"YM103",nombre:"Amelie Embrujada",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:262,color:""}, {id:"YM104",nombre:"Perfect Melody",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:265,color:""}, {id:"YM105",nombre:"Miss Shaun",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:223,color:""},
   cab("YM106","Dream Tim","81","2026-04-24",0), cab("YM107","Air Groove","81","2026-04-24",0), cab("YM108","Kalavana","81","2026-04-24",0),
   cab("YM109","Eslovenia","81","2026-04-24",0), cab("YM110","Sonetta","81","2026-04-24",0), cab("YM111","Torgau","81","2026-04-24",0),
   cab("YM112","Carta Ganadora","81","2026-04-24",0), cab("YM113","Girona Fever","81","2026-04-24",0),
@@ -982,8 +982,10 @@ export default function HarasApp(){
           }
         } catch(e){ console.log("intervenciones error:", e); }
         try {
-          const lluviasDb = await sbSelect("lluvias_campo");
-          if(lluviasDb && lluviasDb.length>0){
+          const lluviasDb = await fetch(`${SUPABASE_URL}/rest/v1/lluvias_campo?select=*&order=fecha`, {
+            headers:{"apikey":SUPABASE_KEY,"Authorization":`Bearer ${getStoredToken()||SUPABASE_KEY}`}
+          }).then(r=>r.json());
+          if(Array.isArray(lluviasDb) && lluviasDb.length>0){
             setLluviasGlobal(lluviasDb.map(l=>({id:l.id,fecha:l.fecha,mm:parseFloat(l.mm)})));
           }
         } catch(e){ console.log("lluvias_campo error:", e); }
@@ -2210,4 +2212,3 @@ export default function HarasApp(){
     </>
   );
 }
-
