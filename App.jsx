@@ -4,20 +4,28 @@ const SUPABASE_URL = "https://xmiygmcczqlvovdwlfov.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtaXlnbWNjenFsdm92ZHdsZm92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjQwOTIsImV4cCI6MjA5NDM0MDA5Mn0._Fp6Ah-pg2Kp9qbemzNZJ7RQj6w34WJRZsWNvVDtYJA";
 
 async function sbFetch(table, method="GET", body=null, filters="") {
-  const token = getStoredToken() || SUPABASE_KEY;
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filters}`, {
-    method,
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Prefer": method==="POST"?"return=representation":"",
-    },
-    body: body ? JSON.stringify(body) : null,
-  });
-  if (!res.ok) return null;
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  const tryFetch = async (token) => {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filters}`, {
+      method,
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "Prefer": method==="POST"?"return=minimal":"",
+      },
+      body: body ? JSON.stringify(body) : null,
+    });
+    if (!res.ok) return null;
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  };
+  // Try with user token first, fallback to anon key
+  const userToken = getStoredToken();
+  if(userToken){
+    const result = await tryFetch(userToken);
+    if(result !== null) return result;
+  }
+  return await tryFetch(SUPABASE_KEY);
 }
 
 // ── Auth helpers ──────────────────────────────────────────────────────────
