@@ -61,7 +61,7 @@ async function sbUpsert(table, data) { return await sbFetch(table, "POST", data,
 async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
 
 
-const CATEGORIAS = ["Padrillo", "Yegua madre", "Potrillo", "Potranca", "Castrado", "Yegua de trabajo"];
+const CATEGORIAS = ["Yegua madre", "Yegua vacía", "Potranca", "Potrillo", "Padrillo"];
 const ALIMENTOS  = ["Heno de alfalfa","Heno de pastura","Grano de maíz","Avena","Pellet comercial","Suplemento proteico","Sal mineral"];
 
 // Consumo neto de pasto por categoría (kg MS/día por animal)
@@ -1038,7 +1038,7 @@ export default function HarasApp(){
   const [busqueda,setBusqueda]=useState("");
 
   const EL={nombre:"",hectareas:"",ultimaDesmalezada:"",notas:"",ultimaSiembra:"",queSembro:"",fechaVacio:"",tieneRiego:false,riegoDiario:""};
-  const EC={nombre:"",categoria:CATEGORIAS[0],alimentos:[],loteId:"",peso:"",color:"",fechaIngreso:hoy()};
+  const EC={nombre:"",categoria:"Yegua madre",alimentos:[],loteId:"",peso:"",color:"",fechaIngreso:hoy()};
   const EI={fecha:hoy(),tipo:"Intersiembra",elemento:""};
   const ED={fecha:hoy(),notas:""};
   const ELl={fecha:hoy(),mm:""};
@@ -2027,7 +2027,7 @@ export default function HarasApp(){
               <div className="fg"><label className="fl">Alimentos</label><div className="cg">{ALIMENTOS.map(a=><label key={a} className={`ci ${fC.alimentos.includes(a)?"ck":""}`}><input type="checkbox" checked={fC.alimentos.includes(a)} onChange={()=>togAlim(a)}/>{a}</label>)}</div></div>
               <div className="fb g2p" style={{marginTop:20,justifyContent:"flex-end"}}>
                 <button className="btn bg" onClick={closeModal}>Cancelar</button>
-                <button className="btn bp" onClick={saveCab}>{editId?"Guardar":"Registrar"}</button>
+                <button className="btn bp" onClick={saveCab} style={{opacity:(!fC.nombre||!fC.loteId)?0.5:1}}>{editId?"Guardar":"Registrar"}{(!fC.nombre||!fC.loteId)?" (completar campos *)":""}</button>
               </div>
             </div>
           </div>
