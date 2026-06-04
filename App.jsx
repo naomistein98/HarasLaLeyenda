@@ -1322,16 +1322,10 @@ export default function HarasApp(){
   };
 
   const primerIngreso=(lid)=>{
-    // Use most recent movement INTO this lote
+    // Use most recent movement INTO this lote only
     const movsEntrada=[...movimientos.filter(m=>m.loteDestino===lid)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
     if(movsEntrada.length>0) return movsEntrada[0].fecha;
-    // Fallback: use STOCK_HISTORIAL first entry with animals
-    const hist=STOCK_HISTORIAL[lid];
-    if(hist&&hist.length>0){
-      const first=hist.find(h=>h.tot>0||h.ent>0);
-      if(first) return first.f;
-    }
-    // No movement data - return null to show "?"
+    // No movement registered - return null to show "?"
     return null;
   };
 
