@@ -264,6 +264,109 @@ const STOCK_HISTORIAL = {
   "88":     [{f:"2026-04-08",cat:"Sin cría",ent:4,sal:0,tot:4},{f:"2026-04-24",cat:"—",ent:0,sal:4,tot:0},{f:"2026-05-13",cat:"Potrillos año y medio",ent:null,sal:null,tot:3}],
 };
 
+
+// ── Yeguas nodrizas (amas) ──────────────────────────────────────────────────
+const amasData = [
+  {id:"AMA001",nombre:"Five Fishes",categoria:"Yegua madre",alimentos:[],loteId:"S41",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA002",nombre:"Walnut Leave",categoria:"Yegua madre",alimentos:[],loteId:"SARROYO",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA003",nombre:"Love Stanza Chance",categoria:"Yegua madre",alimentos:[],loteId:"S31",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA004",nombre:"Perfect Melody",categoria:"Yegua madre",alimentos:[],loteId:"SMEDIO",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA005",nombre:"Dona Bibi",categoria:"Yegua madre",alimentos:[],loteId:"R3",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA006",nombre:"Nearly Mad",categoria:"Yegua madre",alimentos:[],loteId:"R2",fechaIngreso:"",peso:"",color:""},
+  {id:"AMA007",nombre:"La Nicanora",categoria:"Yegua madre",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:"",color:""},
+];
+
+// ── Potrillos 2024 ───────────────────────────────────────────────────────────
+const potrillos2024 = [
+  // F1
+  {id:"P24001",nombre:"Mi Mediterranea 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24002",nombre:"Ay Ay Ay 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24003",nombre:"Tan Bonita 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24004",nombre:"Little Goldilocks 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24005",nombre:"Steel Fill 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24006",nombre:"Life Time Plan 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  // F12
+  {id:"P24007",nombre:"Oh Que Bella 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  {id:"P24008",nombre:"Patrizia 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  {id:"P24009",nombre:"Pase Lo Que Pase 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  // F13
+  {id:"P24010",nombre:"Livia 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  {id:"P24011",nombre:"Nena Amada 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  {id:"P24012",nombre:"Italina 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  // 8.7
+  {id:"P24013",nombre:"Miss Oasis 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  {id:"P24014",nombre:"Dona Bibi 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  {id:"P24015",nombre:"Destiny Match 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  // 8.8
+  {id:"P24016",nombre:"La Hipnosis 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  {id:"P24017",nombre:"Nayla Sam 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  {id:"P24018",nombre:"Fly High 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  // B8
+  {id:"P24019",nombre:"Brangelina 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  {id:"P24020",nombre:"Alfa Omega 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  {id:"P24021",nombre:"Orpen Look 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  // R4
+  {id:"P24022",nombre:"Bella Y Romantica 24",categoria:"Potrillo",alimentos:[],loteId:"R4",fechaIngreso:"",peso:"",color:""},
+];
+
+// ── Cuida sin categoría ──────────────────────────────────────────────────────
+const cuidaSinCat = [
+  {id:"C001",nombre:"Quevasenio",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C002",nombre:"Adorable Man",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C003",nombre:"Cielo",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C004",nombre:"Art",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C005",nombre:"Bonafila",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C006",nombre:"Fabulosa Tap",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C007",nombre:"Irrigada",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C008",nombre:"Superultramega",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C009",nombre:"Wallabie",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C010",nombre:"Daria Lo Que Fuera",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C011",nombre:"Bagatele",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C012",nombre:"Sum Power",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C013",nombre:"Pan Zhanle",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C014",nombre:"Sol",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C015",nombre:"Torri",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C016",nombre:"Oh Que Bella",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C017",nombre:"Patrizia",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C018",nombre:"Pase Lo Que Pase",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C019",nombre:"Embujado",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+  {id:"C020",nombre:"Ophus Alpha",categoria:"",alimentos:[],loteId:"BOXCUIDA",fechaIngreso:"",peso:"",color:""},
+];
+
+// ── Padrillos ────────────────────────────────────────────────────────────────
+const padrillosData = [
+  {id:"PAD001",nombre:"Cima De Triomphe",categoria:"Padrillo",alimentos:[],loteId:"PADRILLERA",fechaIngreso:"",peso:"",color:""},
+  {id:"PAD002",nombre:"Capensis",categoria:"Padrillo",alimentos:[],loteId:"PADRILLERA",fechaIngreso:"",peso:"",color:""},
+  {id:"PAD003",nombre:"Marsalis",categoria:"Padrillo",alimentos:[],loteId:"PADRILLERA",fechaIngreso:"",peso:"",color:""},
+  {id:"PAD004",nombre:"Phelps",categoria:"Padrillo",alimentos:[],loteId:"PADRILLERA",fechaIngreso:"",peso:"",color:""},
+];
+
+// ── Sin lote ─────────────────────────────────────────────────────────────────
+const sinLoteData = [
+  {id:"SL001",nombre:"Si Lo Sabe Cante",categoria:"",alimentos:[],loteId:"",fechaIngreso:"",peso:"",color:""},
+  {id:"SL002",nombre:"Cocomi",categoria:"",alimentos:[],loteId:"",fechaIngreso:"",peso:"",color:""},
+];
+
+// ── Yeguas madres nuevas sin registro previo ─────────────────────────────────
+const yeguasMadresNuevas = [
+  {id:"YM200",nombre:"Titmus",categoria:"Yegua madre",alimentos:[],loteId:"F5",fechaIngreso:"",peso:"",color:""},
+  {id:"YM201",nombre:"Karakoa",categoria:"Yegua madre",alimentos:[],loteId:"F4",fechaIngreso:"",peso:"",color:""},
+  {id:"YM202",nombre:"Carta Ganadora",categoria:"Yegua madre",alimentos:[],loteId:"F5",fechaIngreso:"",peso:"",color:""},
+  {id:"YM203",nombre:"Pampa Dream",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM204",nombre:"Calshot",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM205",nombre:"American Girls",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM206",nombre:"Salome Scent",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM207",nombre:"Suska",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM208",nombre:"Same Filly",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
+  {id:"YM209",nombre:"Hidden Stormy",categoria:"Yegua madre",alimentos:[],loteId:"B6",fechaIngreso:"",peso:"",color:""},
+  {id:"YM210",nombre:"Acces Code",categoria:"Yegua madre",alimentos:[],loteId:"A1",fechaIngreso:"",peso:"",color:""},
+  {id:"YM211",nombre:"Carta Astral",categoria:"Yegua madre",alimentos:[],loteId:"A6",fechaIngreso:"",peso:"",color:""},
+  {id:"YM212",nombre:"Start Queen",categoria:"Yegua madre",alimentos:[],loteId:"GALPUZ",fechaIngreso:"",peso:"",color:""},
+  {id:"YM213",nombre:"In Exchange",categoria:"Yegua madre",alimentos:[],loteId:"GALPUZ",fechaIngreso:"",peso:"",color:""},
+  {id:"YM214",nombre:"French Fries",categoria:"Yegua madre",alimentos:[],loteId:"BAJO",fechaIngreso:"",peso:"",color:""},
+  {id:"YM215",nombre:"Abbuehl",categoria:"Yegua madre",alimentos:[],loteId:"F9",fechaIngreso:"",peso:"",color:""},
+];
+
 const initLotes = [
   { id:"A1",   nombre:"A1",    hectareas:2,    ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"A2",   nombre:"A2",    hectareas:3.5,  ultimaDesmalezada:"2026-05-11", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
@@ -311,6 +414,8 @@ const initLotes = [
   { id:"SARROYO", nombre:"SArroyo", hectareas:9.7, ultimaDesmalezada:"2026-05-04", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"S41",     nombre:"S41",     hectareas:9.7, ultimaDesmalezada:"2026-05-04", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"R2",  nombre:"R2",  hectareas:5.1,  ultimaDesmalezada:"2026-05-11", notas:"Desmalezada solo la mitad (mayo 2026)", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
+  { id:"PADRILLERA", nombre:"Padrillera", hectareas:0, ultimaDesmalezada:null, notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
+  { id:"R4", nombre:"R4", hectareas:0, ultimaDesmalezada:null, notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"BOXCUIDA", nombre:"Box / Cuida", hectareas:0, ultimaDesmalezada:null, notas:"Instalaciones internas", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"GALPUZ", nombre:"Corral Galpón de Luz", hectareas:0, ultimaDesmalezada:null, notas:"Instalaciones internas", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"R3",  nombre:"R3",  hectareas:10.3, ultimaDesmalezada:"2026-05-11", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
@@ -321,37 +426,37 @@ function cab(id, nombre, loteId, fechaIngreso="", peso="") {
 }
 
 const initCaballos = [
-  cab("YM001","Batrana","F6","2026-04-28",0), cab("YM002","Ellijay","F6","2026-04-28",0), cab("YM003","Reina Agatta","F6","2026-04-28",0),
-  cab("YM004","Ride Beach","F6","2026-04-28",0), cab("YM005","Santificada","F6","2026-04-28",0), cab("YM006","Joy Tanguera","F6","2026-04-28",0),
+  cab("YM001","Batrana","F6","2026-04-28",0), cab("YM002","Ellijay","F7","2026-04-28",0), cab("YM003","Reina Agatta","F7","2026-04-28",0),
+  cab("YM004","Ride Beach","F7","2026-04-28",0), cab("YM005","Santificada","F7","2026-04-28",0), cab("YM006","Joy Tanguera","F7","2026-04-28",0),
   cab("YM007","Endless Dream","F6","2026-04-28",0),
   cab("YM008","Miss Top Girl","BAJA","2026-04-28",0), cab("YM009","Karakoa","F7","2026-04-28",0), cab("YM010","Star Of Belen","BAJA","2026-04-28",0),
   cab("YM011","Taylor Rae","BAJA","2026-04-28",0), cab("YM012","Queen Sarah","BAJA","2026-04-28",0), cab("YM013","Lady Thea","BAJA","2026-04-28",0),
   cab("YM014","Miss Tracy Bond","BAJA","2026-04-28",0), cab("YM015","Tweedia","F7","2026-04-28",0), cab("YM016","Opium Ruler","BAJA","2026-04-28",0),
   cab("YM017","Kirshara","BAJA","2026-04-28",0),
-  {id:"YM018",nombre:"Neska Amada 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-05",peso:262,color:""}, {id:"YM019",nombre:"Archie Fan 25",categoria:"Potranca",alimentos:[],loteId:"BAJA",fechaIngreso:"2025-09-25",peso:265,color:""}, {id:"YM020",nombre:"Pleasant Legends 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-18",peso:289,color:""},
+  {id:"YM018",nombre:"Neska Amada 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-05",peso:262,color:""}, {id:"YM019",nombre:"Archie Fan 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-25",peso:265,color:""}, {id:"YM020",nombre:"Pleasant Legends 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-18",peso:289,color:""},
   {id:"YM021",nombre:"Destiny Match 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-04",peso:291,color:""}, {id:"YM022",nombre:"Ishka Baja 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-19",peso:269,color:""}, {id:"YM023",nombre:"Issolda 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-09-14",peso:325,color:""},
-  {id:"YM024",nombre:"Bella Y Romantica 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-17",peso:280,color:""}, {id:"YM025",nombre:"Shafe 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-25",peso:304,color:""}, cab("YM026","Summer Fashion","F8","2026-04-28",0),
+  {id:"YM024",nombre:"Bella Y Romantica 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-17",peso:280,color:""}, {id:"YM025",nombre:"Shafe 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-25",peso:304,color:""}, cab("YM026","Summer Fashion","B5","2026-04-28",0),
   cab("YM027","Calma Romana","F9","2026-04-24",0), cab("YM028","Ven A Mi","BAJA","2026-04-24",0), cab("YM029","Abbuehl","F9","2026-04-24",0),
   cab("YM030","Leopolda Magna","F9","2026-04-24",0), cab("YM031","Break Of Day","F9","2026-04-24",0), {id:"YM032",nombre:"Candy Embrujada 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-17",peso:310,color:""},
   cab("YM033","Wonderful Luck","F9","2026-04-24",0), cab("YM034","Brig","F9","2026-04-24",0), cab("YM035","Fever Tap","F9","2026-04-24",0),
   cab("YM036","Wallapop","F9","2026-04-24",0), {id:"YM037",nombre:"Spuki Inc 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-07-13",peso:320,color:""}, {id:"YM038",nombre:"Summer Rae 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-30",peso:308,color:""},
   {id:"YM039",nombre:"Hai Plus 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-02",peso:275,color:""}, {id:"YM040",nombre:"Sumi Jo 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:301,color:""},
-  cab("YM041","Fancy Indy","A3","2026-04-08",0), cab("YM042","Sola Para Ti","A3","2026-04-08",0),
-  {id:"YM043",nombre:"Opera Pagliacci 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-08-12",peso:302,color:""}, cab("YM044","Island Moon","A2","2026-04-24",0),
+  cab("YM041","Fancy Indy","A6","2026-04-08",0), cab("YM042","Sola Para Ti","A6","2026-04-08",0),
+  {id:"YM043",nombre:"Opera Pagliacci 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-12",peso:302,color:""}, cab("YM044","Island Moon","B2","2026-04-24",0),
   {id:"YM045",nombre:"Titanium Sale 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-04",peso:320,color:""}, {id:"YM046",nombre:"Nayla Sam 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-23",peso:324,color:""},
   {id:"YM047",nombre:"Cala Celeste 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-13",peso:306,color:""}, {id:"YM048",nombre:"Champein 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-22",peso:310,color:""}, {id:"YM049",nombre:"Lola Chai 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-23",peso:320,color:""},
-  {id:"YM050",nombre:"Carneggie Mellon 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-12",peso:347,color:""}, cab("YM051","La Unica Dama","B2","",0), cab("YM052","Accionada Cosmica","B2","",0),
+  {id:"YM050",nombre:"Carneggie Mellon 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-12",peso:347,color:""}, cab("YM051","La Unica Dama","B4","",0), cab("YM052","Accionada Cosmica","B4","",0),
   {id:"YM053",nombre:"Thaddea 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-28",peso:297,color:""}, {id:"YM054",nombre:"Sol Y Sol 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-07-23",peso:334,color:""}, {id:"YM055",nombre:"Niquelada Rye 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-25",peso:314,color:""},
   {id:"YM056",nombre:"Indiana Catcher 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-27",peso:290,color:""}, {id:"YM057",nombre:"Summer Violence 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-06",peso:302,color:""}, {id:"YM058",nombre:"Bally Lee 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-25",peso:319,color:""},
   cab("YM059","Sandrin","B6","2026-04-24",0), cab("YM060","Carmen Embrujada","B6","2026-04-24",0), cab("YM061","Cheating Girl","B6","2026-04-24",0),
   cab("YM062","Joy Niagara","B6","2026-04-24",0), cab("YM063","Laudemio","B6","2026-04-24",0), cab("YM064","Tapitai","B6","2026-04-24",0),
   cab("YM065","Jazz Banda","B6","2026-04-24",0), cab("YM066","Financial Aid","B6","2026-04-24",0), cab("YM067","Acces Code","B6","2026-04-24",0),
-  cab("YM068","Angelic Air","BAJO","2026-04-24",0), cab("YM069","Christofle","BAJO","2026-04-24",0), {id:"YM070",nombre:"Wengen 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-08-04",peso:320,color:""},
+  cab("YM068","Angelic Air","BAJO","2026-04-24",0), cab("YM069","Christofle","BAJO","2026-04-24",0), {id:"YM070",nombre:"Wengen 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-04",peso:320,color:""},
   {id:"YM071",nombre:"Opera Lilly 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-09-29",peso:289,color:""}, {id:"YM072",nombre:"Distar 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-12",peso:283,color:""}, cab("YM073","La Hipnosis","BAJO","2026-04-24",0),
-  {id:"YM074",nombre:"Black Ice 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-08-11",peso:314,color:""}, {id:"YM075",nombre:"Orpen Look 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-08-25",peso:325,color:""}, {id:"YM076",nombre:"Pura Chispa 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-08-03",peso:292,color:""},
+  {id:"YM074",nombre:"Black Ice 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-11",peso:314,color:""}, {id:"YM075",nombre:"Orpen Look 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-25",peso:325,color:""}, {id:"YM076",nombre:"Pura Chispa 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-03",peso:292,color:""},
   cab("YM077","Luminosa Candy","GALPUZ","2026-04-24",0), cab("YM078","Dona Lea","BAJO","2026-04-24",0), cab("YM079","Chispitas","BAJO","2026-04-24",0),
   cab("YM080","Schweigen","BAJO","2026-04-24",0), cab("YM081","Crackdown","BAJO","2026-04-24",0),
-  {id:"YM082",nombre:"Summer Freedom 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-09",peso:272,color:""}, {id:"YM083",nombre:"Dobrinka 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-20",peso:233,color:""}, {id:"YM084",nombre:"American Voodoo 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-25",peso:196,color:""},
+  {id:"YM082",nombre:"Summer Freedom 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-09",peso:272,color:""}, {id:"YM083",nombre:"Dobrinka 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-20",peso:233,color:""}, {id:"YM084",nombre:"American Voodoo 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-25",peso:196,color:""},
   {id:"YM085",nombre:"Miss Lute 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-11-10",peso:242,color:""}, {id:"YM086",nombre:"Tarotista 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-22",peso:261,color:""}, {id:"YM087",nombre:"Nina Berstein 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-21",peso:280,color:""},
   cab("YM088","Calshot","B3","",0), {id:"YM089",nombre:"Fisher Pond 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-19",peso:302,color:""}, cab("YM090","American Girl","B3","",0),
   {id:"YM091",nombre:"Ready N Waiting 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-16",peso:232,color:""}, cab("YM092","Salome Scent","B3","",0), {id:"YM093",nombre:"Chispita 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:305,color:""},
@@ -361,8 +466,14 @@ const initCaballos = [
   {id:"YM103",nombre:"Amelie Embrujada 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-23",peso:262,color:""}, {id:"YM104",nombre:"Perfect Melody 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-26",peso:265,color:""}, {id:"YM105",nombre:"Miss Shaun 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-29",peso:223,color:""},
   cab("YM106","Dream Tim","81","2026-04-24",0), cab("YM107","Air Groove","81","2026-04-24",0), cab("YM108","Kalavana","81","2026-04-24",0),
   cab("YM109","Eslovenia","81","2026-04-24",0), cab("YM110","Sonetta","81","2026-04-24",0), cab("YM111","Torgau","81","2026-04-24",0),
-  cab("YM112","Carta Ganadora","81","2026-04-24",0), cab("YM113","Girona Fever","81","2026-04-24",0),
+  cab("YM112","Carta Ganadora","F5","2026-04-24",0), cab("YM113","Girona Fever","81","2026-04-24",0),
   cab("YM114","Fantasy In Red","81","2026-04-24",0), cab("YM115","Thun","81","2026-04-24",0),
+  ...amasData,
+  ...potrillos2024,
+  ...cuidaSinCat,
+  ...padrillosData,
+  ...sinLoteData,
+  ...yeguasMadresNuevas,
 ];
 
 const initRotaciones = [];
@@ -898,6 +1009,10 @@ export default function HarasApp(){
   const [paramCrecimiento,setParamCrecimiento]=useState([]); // historial de cambios
   const [paramConsumo,setParamConsumo]=useState([]);
   const [movimientos,setMovimientos]=useState(initMovimientos);
+  const [pesoHistorial,setPesoHistorial]=useState([]); // [{id, caballoId, fecha, peso}]
+  const [showPesoModal,setShowPesoModal]=useState(null); // caballoId
+  const [newPesoVal,setNewPesoVal]=useState("");
+  const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
   // Current effective values (latest entry per cultivo/mes or categoria)
   const [tasasActivas,setTasasActivas]=useState({...TASAS_CRECIMIENTO});
@@ -1036,6 +1151,12 @@ export default function HarasApp(){
             setConsumosActivos(prev=>({...prev,...latestCons}));
           }
         } catch(e){ console.log("parametros error:", e); }
+        try {
+          const pesosDb = await sbSelect("peso_historial");
+          if(pesosDb && pesosDb.length>0){
+            setPesoHistorial(pesosDb.map(p=>({id:p.id,caballoId:p.caballo_id,fecha:p.fecha,peso:parseFloat(p.peso)})));
+          }
+        } catch(e){ console.log("peso_historial error:", e); }
         try {
           const movsDb = await sbSelect("movimientos");
           if(movsDb && movsDb.length>0) setMovimientos(movsDb.map(m=>({...m,loteOrigen:m.lote_origen,loteDestino:m.lote_destino,caballoId:m.caballo_id,caballoNombre:m.caballo_nombre})));
@@ -1303,6 +1424,16 @@ export default function HarasApp(){
       setLluviasGlobal(p=>[...p, lluvia]);
       sbUpsert("lluvias_campo",[{id:lluvia.id, fecha:lluvia.fecha, mm:lluvia.mm}]);
     });
+  }
+
+  function addPeso(caballoId, peso, fecha){
+    const newP={id:"PH"+Date.now(),caballoId,fecha,peso:parseFloat(peso)};
+    setPesoHistorial(prev=>[...prev,newP]);
+    // Update peso in caballos
+    setCaballos(prev=>prev.map(c=>c.id===caballoId?{...c,peso:parseFloat(peso)}:c));
+    sbUpsert("peso_historial",[{id:newP.id,caballo_id:caballoId,fecha,peso:parseFloat(peso)}]);
+    saveCaballoToDb({...caballos.find(c=>c.id===caballoId),peso:parseFloat(peso)});
+    showToast("✓ Peso registrado");
   }
 
   function delMovimiento(id){
@@ -1930,13 +2061,20 @@ export default function HarasApp(){
                               <td><strong>{c.nombre}</strong></td>
                               <td><span className="badge">{c.categoria}</span></td>
                               <td className="tm txs">{c.color||"—"}</td>
-                              <td>{c.peso?`${c.peso} kg`:"—"}</td>
+                              <td>
+                                {c.peso?
+                                  <button style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:13,padding:0}} onClick={()=>setShowPesoModal(c.id)}>
+                                    {c.peso} kg
+                                  </button>
+                                :"—"}
+                              </td>
                               <td>{lot?<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:500,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",lot.id)}>{lot.nombre}</button>:"—"}</td>
                               <td className="tg" style={{fontWeight:500}}>{c.fechaIngreso?`${diasDesde(c.fechaIngreso)}d`:"—"}</td>
                               <td style={{maxWidth:180}}>{c.alimentos.map(a=><span key={a} className="tag">{a}</span>)}</td>
                               <td><div className="fb g2p">
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
                                 <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Historial</button>
+                                <button className="btn bg sm" style={{color:"#2d5a00",borderColor:"#a0d080"}} onClick={()=>setShowPesoModal(c.id)}>⚖️ Peso</button>
                                 <button className="btn bd2 sm" onClick={()=>delCab(c.id)}>✕</button>
                               </div></td>
                             </tr>
@@ -2217,6 +2355,41 @@ export default function HarasApp(){
           const EM={fecha:hoy(),tipo:"individual",caballoId:"",caballoNombre:"",cantidad:1,categoria:CATEGORIAS[0],loteOrigen:"",loteDestino:"",motivo:"",notas:""};
           return(
             <MovimientoModal lotes={lotes} caballos={caballos} CATEGORIAS={CATEGORIAS} saveMovimiento={saveMovimiento} closeModal={closeModal} hoy={hoy}/>
+          );
+        })()}
+        {/* MODAL: Peso historial */}
+        {showPesoModal&&(()=>{
+          const cab=caballos.find(c=>c.id===showPesoModal);
+          if(!cab) return null;
+          const histPesos=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+          return(
+            <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowPesoModal(null)}>
+              <div className="md" style={{maxWidth:460}}>
+                <div className="mtit">⚖️ Historial de pesos — {cab.nombre}</div>
+                <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#2d5a00",fontWeight:700,marginBottom:4}}>
+                  {cab.peso?`${cab.peso} kg`:"Sin registro"}
+                  <span style={{fontSize:13,color:"#888",marginLeft:8}}>último peso</span>
+                </div>
+                <div className="div"/>
+                <div className="stit">Registrar nuevo pesaje</div>
+                <div className="fr" style={{marginBottom:16}}>
+                  <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={newPesoFecha||hoy()} onChange={e=>setNewPesoFecha(e.target.value)}/></div>
+                  <div className="fg"><label className="fl">Peso (kg)</label><input className="fi" type="number" step="0.5" value={newPesoVal} onChange={e=>setNewPesoVal(e.target.value)} placeholder="Ej: 320"/></div>
+                </div>
+                <button className="btn bp" style={{marginBottom:20}} onClick={()=>{if(newPesoVal){addPeso(cab.id,newPesoVal,newPesoFecha||hoy());setNewPesoVal("");setNewPesoFecha("");}}}> + Registrar pesaje</button>
+                <div className="stit">Historial</div>
+                {histPesos.length===0
+                  ?<div className="tm txs">Sin registros previos</div>
+                  :<table className="table">
+                    <thead><tr><th>Fecha</th><th>Peso</th></tr></thead>
+                    <tbody>{histPesos.map(p=>(
+                      <tr key={p.id}><td>{fmt(p.fecha)}</td><td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg</td></tr>
+                    ))}</tbody>
+                  </table>
+                }
+                <div style={{marginTop:16,textAlign:"right"}}><button className="btn bg" onClick={()=>setShowPesoModal(null)}>Cerrar</button></div>
+              </div>
+            </div>
           );
         })()}
         {/* MODAL: Historial caballo */}
