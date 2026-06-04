@@ -1322,10 +1322,17 @@ export default function HarasApp(){
   };
 
   const primerIngreso=(lid)=>{
-    const hs=cabsDe(lid);
-    if(!hs.length) return null;
-    const fechas=hs.map(h=>h.fechaIngreso).filter(Boolean).sort();
-    return fechas.length?fechas[0]:null;
+    // Use most recent movement INTO this lote
+    const movsEntrada=[...movimientos.filter(m=>m.loteDestino===lid)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+    if(movsEntrada.length>0) return movsEntrada[0].fecha;
+    // Fallback: use STOCK_HISTORIAL first entry with animals
+    const hist=STOCK_HISTORIAL[lid];
+    if(hist&&hist.length>0){
+      const first=hist.find(h=>h.tot>0||h.ent>0);
+      if(first) return first.f;
+    }
+    // No movement data - return null to show "?"
+    return null;
   };
 
   const lotesFiltrados=useMemo(()=>{
@@ -1709,7 +1716,7 @@ export default function HarasApp(){
                           <span className="badge" style={{background:lEst.bg,color:lEst.color,borderColor:`${lEst.color}40`,fontSize:10}}>{lEst.label}</span>
                         </div>
                         <div className="tm txs" style={{marginBottom:10}}>{l.hectareas?`${l.hectareas} ha`:""} · {n} animales</div>
-                        {dp!==null&&n>0&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Pastoreando</span><span className="iv tg">{dp}d</span></div>}
+                        {n>0&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Pastoreando</span><span className="iv tg">{dp!==null?`${dp}d`:"?"}</span></div>}
                         {dd!==null&&<div className="ir" style={{padding:"6px 0"}}><span className="ik">Descanso</span><span className="iv" style={{color:"#4caf6e"}}>{dd}d</span></div>}
                         <div className="ir" style={{padding:"6px 0"}}><span className="ik">Desmalezada</span><span className="iv">{fmt(l.ultimaDesmalezada)}</span></div>
                         {(()=>{
@@ -1784,7 +1791,7 @@ export default function HarasApp(){
                           {l.ultimaSiembra&&<div className="tm txs">{fmt(l.ultimaSiembra)}{ds!==null?` · hace ${ds} días`:""}</div>}
                         </span>
                       </div>
-                      {dp!==null&&nTotal>0&&<div className="ir"><span className="ik">Días pastoreando</span><span className="iv tg">{dp} días</span></div>}
+                      {nTotal>0&&<div className="ir"><span className="ik">Días pastoreando</span><span className="iv tg">{dp!==null?`${dp} días`:"?"}</span></div>}
                       {dd!==null&&<div className="ir"><span className="ik">En descanso desde</span><span className="iv" style={{color:"#4caf6e"}}>{fmt(l.fechaVacio)} <span className="tm txs">({dd}d)</span></span></div>}
                       <div className="ir"><span className="ik">Superficie</span><span className="iv">{l.hectareas?`${l.hectareas} ha`:"—"}</span></div>
                       <div className="ir"><span className="ik">Presión de pastoreo</span><span className="iv">{pres?`${pres} cab/ha`:"—"}</span></div>
