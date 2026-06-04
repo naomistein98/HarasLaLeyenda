@@ -1263,12 +1263,13 @@ export default function HarasApp(){
 
   // Stock total: last known tot from STOCK_HISTORIAL, else named horses
   const stockTotal=(lid)=>{
+    const named=cabsDe(lid).length;
     const hist=STOCK_HISTORIAL[lid];
     if(hist&&hist.length>0){
       const last=[...hist].reverse().find(m=>m.tot!==null&&m.tot!==undefined);
-      if(last!==undefined) return last.tot;
+      if(last!==undefined) return Math.max(last.tot, named);
     }
-    return cabsDe(lid).length;
+    return named;
   };
   // Determine lote status: "pastoreando" | "creciendo" | "descanso" | "vacio"
   const getLoteEstado=(lid)=>{
