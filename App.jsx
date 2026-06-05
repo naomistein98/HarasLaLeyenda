@@ -1012,6 +1012,7 @@ export default function HarasApp(){
   const [pesoHistorial,setPesoHistorial]=useState([]); // [{id, caballoId, fecha, peso}]
   const [showPesoModal,setShowPesoModal]=useState(null); // caballoId
   const [newPesoVal,setNewPesoVal]=useState("");
+  const [confirmAction,setConfirmAction]=useState(null); // {mensaje, onConfirm}
   const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
   // Current effective values (latest entry per cultivo/mes or categoria)
@@ -1560,13 +1561,14 @@ export default function HarasApp(){
       <div className="app">
         <button className="hamburger" onClick={()=>setSidebarOpen(o=>!o)}>{sidebarOpen?"✕":"☰"}</button>
         {toast&&(
-          <div style={{position:"fixed",bottom:70,right:20,zIndex:400,background:toast.type==="ok"?"#228822":"#cc2222",color:"#fff",borderRadius:10,padding:"12px 20px",fontSize:13,fontWeight:700,boxShadow:"0 4px 12px rgba(0,0,0,.2)",maxWidth:300}}>
+          <div style={{position:"fixed",bottom:80,right:20,zIndex:400,background:toast.type==="ok"?"#228822":"#cc2222",color:"#fff",borderRadius:10,padding:"12px 20px",fontSize:13,fontWeight:700,boxShadow:"0 4px 12px rgba(0,0,0,.2)",maxWidth:300}}>
             {toast.msg}
           </div>
         )}
         {undoStack.length>0&&(
-          <button onClick={doUndo} style={{position:"fixed",bottom:20,right:20,zIndex:300,background:"#1a1410",color:"#fff",border:"none",borderRadius:10,padding:"10px 18px",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,.25)",display:"flex",alignItems:"center",gap:8}}>
-            ↩ Deshacer <span style={{fontSize:11,opacity:.7}}>"{undoStack[0]?.description}"</span>
+          <button onClick={doUndo} style={{position:"fixed",bottom:20,right:20,zIndex:300,background:"#8B6000",color:"#fff",border:"none",borderRadius:12,padding:"14px 24px",fontSize:15,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:10}}>
+            ↩ Deshacer
+            <span style={{fontSize:12,opacity:.85,maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>"{undoStack[0]?.description}"</span>
           </button>
         )}
         <div className={`overlay ${sidebarOpen?"open":""}`} onClick={()=>setSidebarOpen(false)}/>
@@ -2077,7 +2079,7 @@ export default function HarasApp(){
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
                                 <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Historial</button>
                                 <button className="btn bg sm" style={{color:"#2d5a00",borderColor:"#a0d080"}} onClick={()=>setShowPesoModal(c.id)}>⚖️ Peso</button>
-                                <button className="btn bd2 sm" onClick={()=>delCab(c.id)}>✕</button>
+                                <button className="btn bd2 sm" onClick={()=>setConfirmAction({mensaje:`Vas a eliminar a "${c.nombre}" del sistema. Esta acción se puede deshacer.`,onConfirm:()=>delCab(c.id)})}>✕ Eliminar</button>
                               </div></td>
                             </tr>
                           );
@@ -2116,7 +2118,7 @@ export default function HarasApp(){
                               <td>{ori?<button style={{background:"none",border:"none",cursor:"pointer",color:"#8B6000",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteOrigen)}>{ori.nombre}</button>:"—"}</td>
                               <td>{dst?<button style={{background:"none",border:"none",cursor:"pointer",color:"#228822",fontWeight:700,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",m.loteDestino)}>{dst.nombre}</button>:"—"}</td>
                               <td className="tm">{m.motivo||"—"}</td>
-                              <td><button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>delMovimiento(m.id)}>✕</button></td>
+                              <td><button className="btn bd2 sm" style={{padding:"2px 7px"}} onClick={()=>setConfirmAction({mensaje:`Vas a eliminar este movimiento. Se puede deshacer.`,onConfirm:()=>delMovimiento(m.id)})}>✕</button></td>
                             </tr>
                           );
                         })}
@@ -2359,6 +2361,20 @@ export default function HarasApp(){
             <MovimientoModal lotes={lotes} caballos={caballos} CATEGORIAS={CATEGORIAS} saveMovimiento={saveMovimiento} closeModal={closeModal} hoy={hoy}/>
           );
         })()}
+        {/* MODAL: Confirmación */}
+        {confirmAction&&(
+          <div className="mo" onClick={e=>e.target===e.currentTarget&&setConfirmAction(null)}>
+            <div className="md" style={{maxWidth:380,textAlign:"center"}}>
+              <div style={{fontSize:40,marginBottom:12}}>⚠️</div>
+              <div className="mtit" style={{marginBottom:12}}>¿Estás seguro?</div>
+              <div style={{fontSize:15,color:"#555",marginBottom:24,fontWeight:500}}>{confirmAction.mensaje}</div>
+              <div className="fb g2p" style={{justifyContent:"center"}}>
+                <button className="btn bg" style={{padding:"12px 24px",fontSize:14}} onClick={()=>setConfirmAction(null)}>Cancelar</button>
+                <button className="btn bd2" style={{padding:"12px 24px",fontSize:14,background:"#cc2222",color:"#fff",border:"none"}} onClick={()=>{confirmAction.onConfirm();setConfirmAction(null);}}>Sí, eliminar</button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* MODAL: Peso historial */}
         {showPesoModal&&(()=>{
           const cab=caballos.find(c=>c.id===showPesoModal);
