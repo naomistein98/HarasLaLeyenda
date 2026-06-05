@@ -1012,6 +1012,10 @@ export default function HarasApp(){
   const [pesoHistorial,setPesoHistorial]=useState([]); // [{id, caballoId, fecha, peso}]
   const [showPesoModal,setShowPesoModal]=useState(null); // caballoId
   const [newPesoVal,setNewPesoVal]=useState("");
+  const [filtroCat,setFiltroCat]=useState(""); // filter caballos by categoria
+  const [filtroCabNombre,setFiltroCabNombre]=useState(""); // search caballos by nombre
+  const [filtroLoteNombre,setFiltroLoteNombre]=useState(""); // search lotes by nombre
+  const [filtroLoteTipo,setFiltroLoteTipo]=useState(""); // filter lotes by cultivo type
   const [confirmAction,setConfirmAction]=useState(null); // {mensaje, onConfirm}
   const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
@@ -1330,10 +1334,26 @@ export default function HarasApp(){
     return null;
   };
 
+  const caballosFiltrados=useMemo(()=>{
+    return caballos.filter(c=>{
+      const matchCat = !filtroCat || c.categoria===filtroCat;
+      const matchNombre = !filtroCabNombre || c.nombre.toLowerCase().includes(filtroCabNombre.toLowerCase());
+      return matchCat && matchNombre;
+    });
+  },[caballos,filtroCat,filtroCabNombre]);
+
   const lotesFiltrados=useMemo(()=>{
-    if(!busqueda)return lotes;
-    return lotes.filter(l=>l.nombre.toLowerCase().includes(busqueda.toLowerCase()));
-  },[lotes,busqueda]);
+    return lotes.filter(l=>{
+      const matchNombre = !filtroLoteNombre && !busqueda || 
+        l.nombre.toLowerCase().includes((filtroLoteNombre||busqueda).toLowerCase());
+      const siembras = SIEMBRAS[l.id];
+      const ultimoCultivo = siembras?siembras[siembras.length-1]?.c?.toLowerCase():"";
+      const matchTipo = !filtroLoteTipo || 
+        (filtroLoteTipo==="pastura" && (ultimoCultivo.includes("pastura")||ultimoCultivo.includes("natural"))) ||
+        (filtroLoteTipo==="verdeo" && (ultimoCultivo.includes("avena")||ultimoCultivo.includes("rye")||ultimoCultivo.includes("raygrass")||ultimoCultivo.includes("moha")));
+      return matchNombre && matchTipo;
+    });
+  },[lotes,busqueda,filtroLoteNombre,filtroLoteTipo]);
 
   const stats=useMemo(()=>({
     totalCabs:caballos.length,
@@ -2052,8 +2072,18 @@ export default function HarasApp(){
                 <button className="btn bp" onClick={()=>{setEditId(null);setFC(EC);setModal("cab");}}>+ Nuevo caballo</button>
               </div>
               <div className="cnt">
+                <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16,alignItems:"center"}}>
+                  <input className="fi" style={{flex:1,minWidth:200,marginBottom:0}} value={filtroCabNombre} onChange={e=>setFiltroCabNombre(e.target.value)} placeholder="🔍 Buscar por nombre…"/>
+                  <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                    {["","Yegua madre","Yegua vacía","Potranca","Potrillo","Padrillo"].map(cat=>(
+                      <button key={cat} onClick={()=>setFiltroCat(cat)} style={{padding:"6px 12px",borderRadius:8,border:`1px solid ${filtroCat===cat?"#8B6000":"#e0ddd8"}`,background:filtroCat===cat?"#8B6000":"#fff",color:filtroCat===cat?"#fff":"#333",fontWeight:600,fontSize:12,cursor:"pointer"}}>
+                        {cat||"Todas"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="card">
-                  {caballos.length===0
+                  {caballosFiltrados.length===0
                     ?<div className="es"><div style={{fontSize:40,marginBottom:12}}>🐴</div>Sin caballos registrados.</div>
                     :<table className="table">
                       <thead><tr><th>Nombre</th><th>Categoría</th><th>Color</th><th>Peso</th><th>Lote</th><th>Días</th><th>Alimentos</th><th></th></tr></thead>
@@ -2077,7 +2107,7 @@ export default function HarasApp(){
                               <td style={{maxWidth:180}}>{c.alimentos.map(a=><span key={a} className="tag">{a}</span>)}</td>
                               <td><div className="fb g2p">
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
-                                <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Historial</button>
+                                <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Movimientos</button>
                                 <button className="btn bg sm" style={{color:"#2d5a00",borderColor:"#a0d080"}} onClick={()=>setShowPesoModal(c.id)}>⚖️ Peso</button>
                                 <button className="btn bd2 sm" onClick={()=>setConfirmAction({mensaje:`Vas a eliminar a "${c.nombre}" del sistema. Esta acción se puede deshacer.`,onConfirm:()=>delCab(c.id)})}>✕ Eliminar</button>
                               </div></td>
