@@ -350,16 +350,12 @@ const sinLoteData = [
 // ── Yeguas madres nuevas sin registro previo ─────────────────────────────────
 const yeguasMadresNuevas = [
   {id:"YM200",nombre:"Titmus",categoria:"Yegua madre",alimentos:[],loteId:"F5",fechaIngreso:"",peso:"",color:""},
-  {id:"YM201",nombre:"Karakoa",categoria:"Yegua madre",alimentos:[],loteId:"F4",fechaIngreso:"",peso:"",color:""},
-  {id:"YM202",nombre:"Carta Ganadora",categoria:"Yegua madre",alimentos:[],loteId:"F5",fechaIngreso:"",peso:"",color:""},
+
   {id:"YM203",nombre:"Pampa Dream",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
-  {id:"YM204",nombre:"Calshot",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
   {id:"YM205",nombre:"American Girls",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
-  {id:"YM206",nombre:"Salome Scent",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
   {id:"YM207",nombre:"Suska",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
   {id:"YM208",nombre:"Same Filly",categoria:"Yegua madre",alimentos:[],loteId:"B3",fechaIngreso:"",peso:"",color:""},
   {id:"YM209",nombre:"Hidden Stormy",categoria:"Yegua madre",alimentos:[],loteId:"B6",fechaIngreso:"",peso:"",color:""},
-  {id:"YM210",nombre:"Acces Code",categoria:"Yegua madre",alimentos:[],loteId:"A1",fechaIngreso:"",peso:"",color:""},
   {id:"YM211",nombre:"Carta Astral",categoria:"Yegua madre",alimentos:[],loteId:"A6",fechaIngreso:"",peso:"",color:""},
   {id:"YM212",nombre:"Start Queen",categoria:"Yegua madre",alimentos:[],loteId:"GALPUZ",fechaIngreso:"",peso:"",color:""},
   {id:"YM213",nombre:"In Exchange",categoria:"Yegua madre",alimentos:[],loteId:"GALPUZ",fechaIngreso:"",peso:"",color:""},
