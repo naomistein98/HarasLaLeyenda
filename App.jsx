@@ -1067,33 +1067,35 @@ export default function HarasApp(){
   }
 
   function navigate(newView, newLote=null){
+    if(newView!==view){ setFiltroCat(""); setFiltroCabNombre(""); setFiltroLoteNombre(""); setFiltroLoteTipo(""); }
     setView(newView);
     setSelLote(newLote);
     window.history.pushState({view:newView, selLote:newLote}, "");
-  } // [{id, fecha, mm}]
+  }
 
   // Lluvia acumulada desde el 1 de enero
   const lluviaDesdeEnero = useMemo(()=>{
-    const inicio = new Date(new Date().getFullYear(),0,1);
-    return lluviasGlobal
-      .filter(l=>new Date(l.fecha)>=inicio)
-      .reduce((s,l)=>s+l.mm,0);
+    const inicio = `${new Date().getFullYear()}-01-01`;
+    return Math.round(lluviasGlobal
+      .filter(l=>l.fecha>=inicio)
+      .reduce((s,l)=>s+(parseFloat(l.mm)||0),0)*10)/10;
   },[lluviasGlobal]);
 
   // Días sin lluvia
   const diasSinLluvia = useMemo(()=>{
     if(!lluviasGlobal.length) return null;
     const ultima = [...lluviasGlobal].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
-    return diasDesde(ultima.fecha);
+    return ultima ? diasDesde(ultima.fecha) : null;
   },[lluviasGlobal]);
 
   // Lluvia acumulada en los últimos 21 días
   const lluviaUltimos21 = useMemo(()=>{
     const hace21 = new Date();
     hace21.setDate(hace21.getDate()-21);
-    return lluviasGlobal
-      .filter(l=>new Date(l.fecha)>=hace21)
-      .reduce((s,l)=>s+l.mm,0);
+    const hace21str = hace21.toISOString().split('T')[0];
+    return Math.round(lluviasGlobal
+      .filter(l=>l.fecha>=hace21str)
+      .reduce((s,l)=>s+(parseFloat(l.mm)||0),0)*10)/10;
   },[lluviasGlobal]);
   const [loading,setLoading]=useState(false);
   const [dbConnected,setDbConnected]=useState(false);
@@ -1155,7 +1157,19 @@ export default function HarasApp(){
         try {
           const pesosDb = await sbSelect("peso_historial");
           if(pesosDb && pesosDb.length>0){
-            setPesoHistorial(pesosDb.map(p=>({id:p.id,caballoId:p.caballo_id,fecha:p.fecha,peso:parseFloat(p.peso)})));
+            const mappedPesos = pesosDb.map(p=>({id:p.id,caballoId:p.caballo_id,fecha:p.fecha,peso:parseFloat(p.peso)}));
+            setPesoHistorial(mappedPesos);
+            // Update each caballo with their latest peso
+            const latestByHorse = {};
+            mappedPesos.forEach(p=>{
+              if(!latestByHorse[p.caballoId]||p.fecha>latestByHorse[p.caballoId].fecha){
+                latestByHorse[p.caballoId]=p;
+              }
+            });
+            setCaballos(prev=>prev.map(c=>{
+              if(latestByHorse[c.id]) return {...c,peso:latestByHorse[c.id].peso};
+              return c;
+            }));
           }
         } catch(e){ console.log("peso_historial error:", e); }
         try {
@@ -1448,10 +1462,18 @@ export default function HarasApp(){
   function addPeso(caballoId, peso, fecha){
     const newP={id:"PH"+Date.now(),caballoId,fecha,peso:parseFloat(peso)};
     setPesoHistorial(prev=>[...prev,newP]);
-    // Update peso in caballos
-    setCaballos(prev=>prev.map(c=>c.id===caballoId?{...c,peso:parseFloat(peso)}:c));
+    // Always update displayed peso to latest registered
+    setCaballos(prev=>prev.map(c=>{
+      if(c.id!==caballoId) return c;
+      // Check if this is the most recent peso
+      const prevPesos=pesoHistorial.filter(p=>p.caballoId===caballoId);
+      const latestFecha=prevPesos.length>0?[...prevPesos].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0].fecha:"";
+      if(fecha>=latestFecha) return {...c,peso:parseFloat(peso)};
+      return c;
+    }));
     sbUpsert("peso_historial",[{id:newP.id,caballo_id:caballoId,fecha,peso:parseFloat(peso)}]);
-    saveCaballoToDb({...caballos.find(c=>c.id===caballoId),peso:parseFloat(peso)});
+    const cab=caballos.find(c=>c.id===caballoId);
+    if(cab) saveCaballoToDb({...cab,peso:parseFloat(peso)});
     showToast("✓ Peso registrado");
   }
 
