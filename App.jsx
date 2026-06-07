@@ -2106,7 +2106,7 @@ export default function HarasApp(){
                     :<table className="table">
                       <thead><tr><th>Nombre</th><th>Categoría</th><th>Color</th><th>Peso</th><th>Lote</th><th>Días</th><th>Alimentos</th><th></th></tr></thead>
                       <tbody>
-                        {caballos.map(c=>{
+                        {caballosFiltrados.map(c=>{
                           const lot=lotes.find(l=>l.id===c.loteId);
                           return(
                             <tr key={c.id}>
