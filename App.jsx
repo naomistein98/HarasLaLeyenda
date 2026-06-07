@@ -1162,7 +1162,7 @@ export default function HarasApp(){
             // Update each caballo with their latest peso
             const latestByHorse = {};
             mappedPesos.forEach(p=>{
-              if(!latestByHorse[p.caballoId]||p.fecha>latestByHorse[p.caballoId].fecha){
+              if(!latestByHorse[p.caballoId]||p.fecha>latestByHorse[p.caballoId].fecha||(p.fecha===latestByHorse[p.caballoId].fecha&&p.id>latestByHorse[p.caballoId].id)){
                 latestByHorse[p.caballoId]=p;
               }
             });
@@ -1230,7 +1230,7 @@ export default function HarasApp(){
               setPesoHistorial(mappedPesos2);
               const latestByHorse2 = {};
               mappedPesos2.forEach(p=>{
-                if(!latestByHorse2[p.caballoId]||p.fecha>latestByHorse2[p.caballoId].fecha){
+                if(!latestByHorse2[p.caballoId]||p.fecha>latestByHorse2[p.caballoId].fecha||(p.fecha===latestByHorse2[p.caballoId].fecha&&p.id>latestByHorse2[p.caballoId].id)){
                   latestByHorse2[p.caballoId]=p;
                 }
               });
@@ -2143,7 +2143,7 @@ export default function HarasApp(){
                               <td className="tm txs">{c.color||"—"}</td>
                               <td onClick={()=>setShowPesoModal(c.id)} style={{cursor:"pointer"}}>
                                 {(()=>{
-                                  const histC=[...pesoHistorial.filter(p=>p.caballoId===c.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                                  const histC=[...pesoHistorial.filter(p=>p.caballoId===c.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
                                   const ultimo=histC[0];
                                   const pesoShow=ultimo?ultimo.peso:(c.peso||null);
                                   const fechaShow=ultimo?ultimo.fecha:null;
@@ -2462,7 +2462,7 @@ export default function HarasApp(){
         {showPesoModal&&(()=>{
           const cab=caballos.find(c=>c.id===showPesoModal);
           if(!cab) return null;
-          const histPesos=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+          const histPesos=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
           // If horse has peso but no historial, show it as initial entry
           const pesosConInicial = histPesos.length===0 && cab.peso ? 
             [{id:"init",caballoId:cab.id,fecha:cab.fechaIngreso||"",peso:cab.peso,esInicial:true}] : 
@@ -2472,7 +2472,7 @@ export default function HarasApp(){
               <div className="md" style={{maxWidth:460}}>
                 <div className="mtit">⚖️ Historial de pesos — {cab.nombre}</div>
                 {(()=>{
-                  const histC=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                  const histC=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
                   const ultimo=histC.length>0?histC[0]:null;
                   const pesoShow=ultimo?ultimo.peso:cab.peso;
                   const fechaShow=ultimo?ultimo.fecha:null;
