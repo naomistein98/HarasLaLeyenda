@@ -2114,11 +2114,18 @@ export default function HarasApp(){
                               <td><span className="badge">{c.categoria}</span></td>
                               <td className="tm txs">{c.color||"—"}</td>
                               <td>
-                                {c.peso?
-                                  <button style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:13,padding:0}} onClick={()=>setShowPesoModal(c.id)}>
-                                    {c.peso} kg
-                                  </button>
-                                :"—"}
+                                {(()=>{
+                                  const histC=[...pesoHistorial.filter(p=>p.caballoId===c.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                                  const ultimoPeso=histC.length>0?histC[0]:null;
+                                  const pesoMostrar=ultimoPeso?ultimoPeso.peso:c.peso;
+                                  const fechaMostrar=ultimoPeso?ultimoPeso.fecha:null;
+                                  return pesoMostrar?(
+                                    <button style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:13,padding:0,textAlign:"left"}} onClick={()=>setShowPesoModal(c.id)}>
+                                      <div>{pesoMostrar} kg</div>
+                                      {fechaMostrar&&<div style={{fontSize:10,color:"#888",fontWeight:500}}>{fmt(fechaMostrar)}</div>}
+                                    </button>
+                                  ):<span style={{color:"#aaa"}}>—</span>;
+                                })()}
                               </td>
                               <td>{lot?<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--gold)",fontWeight:500,fontSize:13,padding:0,textDecoration:"underline"}} onClick={()=>navigate("lotes",lot.id)}>{lot.nombre}</button>:"—"}</td>
                               <td className="tg" style={{fontWeight:500}}>{c.fechaIngreso?`${diasDesde(c.fechaIngreso)}d`:"—"}</td>
@@ -2428,14 +2435,26 @@ export default function HarasApp(){
           const cab=caballos.find(c=>c.id===showPesoModal);
           if(!cab) return null;
           const histPesos=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+          // If horse has peso but no historial, show it as initial entry
+          const pesosConInicial = histPesos.length===0 && cab.peso ? 
+            [{id:"init",caballoId:cab.id,fecha:cab.fechaIngreso||"",peso:cab.peso,esInicial:true}] : 
+            histPesos;
           return(
             <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowPesoModal(null)}>
               <div className="md" style={{maxWidth:460}}>
                 <div className="mtit">⚖️ Historial de pesos — {cab.nombre}</div>
-                <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#2d5a00",fontWeight:700,marginBottom:4}}>
-                  {cab.peso?`${cab.peso} kg`:"Sin registro"}
-                  <span style={{fontSize:13,color:"#888",marginLeft:8}}>último peso</span>
-                </div>
+                {(()=>{
+                  const histC=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+                  const ultimo=histC.length>0?histC[0]:null;
+                  const pesoShow=ultimo?ultimo.peso:cab.peso;
+                  const fechaShow=ultimo?ultimo.fecha:null;
+                  return(
+                    <div style={{fontFamily:"Playfair Display,serif",fontSize:28,color:"#2d5a00",fontWeight:700,marginBottom:4}}>
+                      {pesoShow?`${pesoShow} kg`:"Sin registro"}
+                      <span style={{fontSize:13,color:"#888",marginLeft:8}}>{fechaShow?`al ${fmt(fechaShow)}`:"último peso"}</span>
+                    </div>
+                  );
+                })()}
                 <div className="div"/>
                 <div className="stit">Registrar nuevo pesaje</div>
                 <div className="fr" style={{marginBottom:16}}>
@@ -2444,12 +2463,15 @@ export default function HarasApp(){
                 </div>
                 <button className="btn bp" style={{marginBottom:20}} onClick={()=>{if(newPesoVal){addPeso(cab.id,newPesoVal,newPesoFecha||hoy());setNewPesoVal("");setNewPesoFecha("");}}}> + Registrar pesaje</button>
                 <div className="stit">Historial</div>
-                {histPesos.length===0
+                {pesosConInicial.length===0
                   ?<div className="tm txs">Sin registros previos</div>
                   :<table className="table">
                     <thead><tr><th>Fecha</th><th>Peso</th></tr></thead>
-                    <tbody>{histPesos.map(p=>(
-                      <tr key={p.id}><td>{fmt(p.fecha)}</td><td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg</td></tr>
+                    <tbody>{pesosConInicial.map(p=>(
+                      <tr key={p.id}>
+                        <td>{p.fecha?fmt(p.fecha):<span style={{color:"#aaa"}}>Sin fecha</span>}</td>
+                        <td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg {p.esInicial&&<span style={{fontSize:10,color:"#888"}}>(inicial)</span>}</td>
+                      </tr>
                     ))}</tbody>
                   </table>
                 }
