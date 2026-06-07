@@ -2123,17 +2123,17 @@ export default function HarasApp(){
                               <td><strong>{c.nombre}</strong></td>
                               <td><span className="badge">{c.categoria}</span></td>
                               <td className="tm txs">{c.color||"—"}</td>
-                              <td>
+                              <td onClick={()=>setShowPesoModal(c.id)} style={{cursor:"pointer"}}>
                                 {(()=>{
                                   const histC=[...pesoHistorial.filter(p=>p.caballoId===c.id)].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-                                  const ultimoPeso=histC.length>0?histC[0]:null;
-                                  const pesoMostrar=ultimoPeso?ultimoPeso.peso:c.peso;
-                                  const fechaMostrar=ultimoPeso?ultimoPeso.fecha:null;
-                                  return pesoMostrar?(
-                                    <button style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:13,padding:0,textAlign:"left"}} onClick={()=>setShowPesoModal(c.id)}>
-                                      <div>{pesoMostrar} kg</div>
-                                      {fechaMostrar&&<div style={{fontSize:10,color:"#888",fontWeight:500}}>{fmt(fechaMostrar)}</div>}
-                                    </button>
+                                  const ultimo=histC[0];
+                                  const pesoShow=ultimo?ultimo.peso:(c.peso||null);
+                                  const fechaShow=ultimo?ultimo.fecha:null;
+                                  return pesoShow?(
+                                    <div style={{color:"#2d5a00",fontWeight:700,fontSize:13}}>
+                                      <div>{pesoShow} kg</div>
+                                      {fechaShow&&<div style={{fontSize:10,color:"#888",fontWeight:500}}>{fmt(fechaShow)}</div>}
+                                    </div>
                                   ):<span style={{color:"#aaa"}}>—</span>;
                                 })()}
                               </td>
