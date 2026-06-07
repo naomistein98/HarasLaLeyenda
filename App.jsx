@@ -1211,7 +1211,6 @@ export default function HarasApp(){
           setCaballos(prev=>{
             const dbIds = new Set(dbCaballos.map(c=>c.id));
             const seedOnly = prev.filter(c=>!dbIds.has(c.id));
-            // Also save seed data to DB so it's there next time
             seedOnly.forEach(c=>{
               sbUpsert("caballos",[{
                 id:c.id, nombre:c.nombre, categoria:c.categoria,
@@ -1219,9 +1218,28 @@ export default function HarasApp(){
                 fecha_ingreso:c.fechaIngreso||null, peso:c.peso||null, color:c.color||null,
               }]);
             });
+            // After setting caballos, we'll update with latest peso from historial below
             return [...dbCaballos, ...seedOnly];
           });
           setDbConnected(true);
+          // Load peso historial AFTER caballos so we can apply latest peso correctly
+          try {
+            const pesosDb2 = await sbSelect("peso_historial");
+            if(pesosDb2 && pesosDb2.length>0){
+              const mappedPesos2 = pesosDb2.map(p=>({id:p.id,caballoId:p.caballo_id,fecha:p.fecha,peso:parseFloat(p.peso)}));
+              setPesoHistorial(mappedPesos2);
+              const latestByHorse2 = {};
+              mappedPesos2.forEach(p=>{
+                if(!latestByHorse2[p.caballoId]||p.fecha>latestByHorse2[p.caballoId].fecha){
+                  latestByHorse2[p.caballoId]=p;
+                }
+              });
+              setCaballos(prev=>prev.map(c=>{
+                if(latestByHorse2[c.id]) return {...c,peso:latestByHorse2[c.id].peso};
+                return c;
+              }));
+            }
+          } catch(e){ console.log("peso reload error:", e); }
         }
       } catch(e) { console.log("DB not available, using local data"); }
       setLoading(false);
