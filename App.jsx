@@ -1460,20 +1460,30 @@ export default function HarasApp(){
   }
 
   function addPeso(caballoId, peso, fecha){
-    const newP={id:"PH"+Date.now(),caballoId,fecha,peso:parseFloat(peso)};
-    setPesoHistorial(prev=>[...prev,newP]);
-    // Always update displayed peso to latest registered
-    setCaballos(prev=>prev.map(c=>{
-      if(c.id!==caballoId) return c;
-      // Check if this is the most recent peso
-      const prevPesos=pesoHistorial.filter(p=>p.caballoId===caballoId);
-      const latestFecha=prevPesos.length>0?[...prevPesos].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0].fecha:"";
-      if(fecha>=latestFecha) return {...c,peso:parseFloat(peso)};
-      return c;
-    }));
-    sbUpsert("peso_historial",[{id:newP.id,caballo_id:caballoId,fecha,peso:parseFloat(peso)}]);
-    const cab=caballos.find(c=>c.id===caballoId);
-    if(cab) saveCaballoToDb({...cab,peso:parseFloat(peso)});
+    const cab = caballos.find(c=>c.id===caballoId);
+    const toSave = [];
+
+    // If caballo has existing peso but it's not yet in historial, save it first
+    if(cab && cab.peso){
+      const yaEnHistorial = pesoHistorial.some(p=>p.caballoId===caballoId && parseFloat(p.peso)===parseFloat(cab.peso));
+      if(!yaEnHistorial){
+        const pesoViejo = {id:"PH"+Date.now()+"_v", caballoId, fecha:cab.fechaIngreso||fecha, peso:parseFloat(cab.peso)};
+        setPesoHistorial(prev=>[...prev, pesoViejo]);
+        toSave.push({id:pesoViejo.id, caballo_id:caballoId, fecha:pesoViejo.fecha, peso:pesoViejo.peso});
+      }
+    }
+
+    // Add new peso
+    const newP = {id:"PH"+(Date.now()+1), caballoId, fecha, peso:parseFloat(peso)};
+    setPesoHistorial(prev=>[...prev, newP]);
+    toSave.push({id:newP.id, caballo_id:caballoId, fecha, peso:parseFloat(peso)});
+
+    // Update caballo peso to latest
+    setCaballos(prev=>prev.map(c=>c.id===caballoId?{...c,peso:parseFloat(peso)}:c));
+
+    // Save all to DB
+    if(toSave.length>0) sbUpsert("peso_historial", toSave);
+    if(cab) saveCaballoToDb({...cab, peso:parseFloat(peso)});
     showToast("✓ Peso registrado");
   }
 
