@@ -2494,13 +2494,33 @@ export default function HarasApp(){
                 {pesosConInicial.length===0
                   ?<div className="tm txs">Sin registros previos</div>
                   :<table className="table">
-                    <thead><tr><th>Fecha</th><th>Peso</th></tr></thead>
-                    <tbody>{pesosConInicial.map(p=>(
-                      <tr key={p.id}>
-                        <td>{p.fecha?fmt(p.fecha):<span style={{color:"#aaa"}}>Sin fecha</span>}</td>
-                        <td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg {p.esInicial&&<span style={{fontSize:10,color:"#888"}}>(inicial)</span>}</td>
-                      </tr>
-                    ))}</tbody>
+                    <thead><tr><th>Fecha</th><th>Peso</th><th>Var. diaria</th></tr></thead>
+                    <tbody>{pesosConInicial.map((p,idx)=>{
+                      // pesosConInicial is sorted desc (most recent first)
+                      // compare with the PREVIOUS one chronologically = next in this array
+                      const anterior = pesosConInicial[idx+1];
+                      let variacion = null;
+                      if(anterior && p.fecha && anterior.fecha && p.fecha!==anterior.fecha){
+                        const dias = (new Date(p.fecha) - new Date(anterior.fecha)) / (1000*60*60*24);
+                        if(dias>0){
+                          variacion = (parseFloat(p.peso) - parseFloat(anterior.peso)) / dias;
+                        }
+                      }
+                      return(
+                        <tr key={p.id}>
+                          <td>{p.fecha?fmt(p.fecha):<span style={{color:"#aaa"}}>Sin fecha</span>}</td>
+                          <td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg {p.esInicial&&<span style={{fontSize:10,color:"#888"}}>(inicial)</span>}</td>
+                          <td>
+                            {variacion!==null
+                              ?<span style={{fontWeight:700,color:variacion>=0?"#2d5a00":"#cc2222"}}>
+                                {variacion>=0?"+":""}{variacion.toFixed(2)} kg/día
+                              </span>
+                              :<span style={{color:"#aaa",fontSize:12}}>—</span>
+                            }
+                          </td>
+                        </tr>
+                      );
+                    })}</tbody>
                   </table>
                 }
                 <div style={{marginTop:16,textAlign:"right"}}><button className="btn bg" onClick={()=>setShowPesoModal(null)}>Cerrar</button></div>
