@@ -72,7 +72,7 @@ async function sbUpsert(table, data) {
 async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
 
 
-const CATEGORIAS = ["Yegua madre", "Yegua vacía", "Potranca", "Potrillo", "Padrillo"];
+const CATEGORIAS = ["Yegua madre", "Yegua vacía", "Potrillos 2025", "Potrillos 2024", "Padrillo"];
 const ALIMENTOS  = ["Heno de alfalfa","Heno de pastura","Grano de maíz","Avena","Pellet comercial","Suplemento proteico","Sal mineral"];
 
 // Consumo neto de pasto por categoría (kg MS/día por animal)
@@ -279,34 +279,34 @@ const amasData = [
 // ── Potrillos 2024 ───────────────────────────────────────────────────────────
 const potrillos2024 = [
   // F1
-  {id:"P24001",nombre:"Mi Mediterranea 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
-  {id:"P24002",nombre:"Ay Ay Ay 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
-  {id:"P24003",nombre:"Tan Bonita 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
-  {id:"P24004",nombre:"Little Goldilocks 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
-  {id:"P24005",nombre:"Steel Fill 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
-  {id:"P24006",nombre:"Life Time Plan 24",categoria:"Potrillo",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24001",nombre:"Mi Mediterranea 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24002",nombre:"Ay Ay Ay 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24003",nombre:"Tan Bonita 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24004",nombre:"Little Goldilocks 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24005",nombre:"Steel Fill 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
+  {id:"P24006",nombre:"Life Time Plan 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F1",fechaIngreso:"",peso:"",color:""},
   // F12
-  {id:"P24007",nombre:"Oh Que Bella 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
-  {id:"P24008",nombre:"Patrizia 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
-  {id:"P24009",nombre:"Pase Lo Que Pase 24",categoria:"Potrillo",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  {id:"P24007",nombre:"Oh Que Bella 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  {id:"P24008",nombre:"Patrizia 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
+  {id:"P24009",nombre:"Pase Lo Que Pase 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F12",fechaIngreso:"",peso:"",color:""},
   // F13
-  {id:"P24010",nombre:"Livia 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
-  {id:"P24011",nombre:"Nena Amada 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
-  {id:"P24012",nombre:"Italina 24",categoria:"Potrillo",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  {id:"P24010",nombre:"Livia 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  {id:"P24011",nombre:"Nena Amada 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
+  {id:"P24012",nombre:"Italina 24",categoria:"Potrillos 2024",alimentos:[],loteId:"F13",fechaIngreso:"",peso:"",color:""},
   // 8.7
-  {id:"P24013",nombre:"Miss Oasis 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
-  {id:"P24014",nombre:"Dona Bibi 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
-  {id:"P24015",nombre:"Destiny Match 24",categoria:"Potrillo",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  {id:"P24013",nombre:"Miss Oasis 24",categoria:"Potrillos 2024",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  {id:"P24014",nombre:"Dona Bibi 24",categoria:"Potrillos 2024",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
+  {id:"P24015",nombre:"Destiny Match 24",categoria:"Potrillos 2024",alimentos:[],loteId:"87",fechaIngreso:"",peso:"",color:""},
   // 8.8
-  {id:"P24016",nombre:"La Hipnosis 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
-  {id:"P24017",nombre:"Nayla Sam 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
-  {id:"P24018",nombre:"Fly High 24",categoria:"Potrillo",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  {id:"P24016",nombre:"La Hipnosis 24",categoria:"Potrillos 2024",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  {id:"P24017",nombre:"Nayla Sam 24",categoria:"Potrillos 2024",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
+  {id:"P24018",nombre:"Fly High 24",categoria:"Potrillos 2024",alimentos:[],loteId:"88",fechaIngreso:"",peso:"",color:""},
   // B8
-  {id:"P24019",nombre:"Brangelina 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
-  {id:"P24020",nombre:"Alfa Omega 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
-  {id:"P24021",nombre:"Orpen Look 24",categoria:"Potrillo",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  {id:"P24019",nombre:"Brangelina 24",categoria:"Potrillos 2024",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  {id:"P24020",nombre:"Alfa Omega 24",categoria:"Potrillos 2024",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
+  {id:"P24021",nombre:"Orpen Look 24",categoria:"Potrillos 2024",alimentos:[],loteId:"B8",fechaIngreso:"",peso:"",color:""},
   // R4
-  {id:"P24022",nombre:"Bella Y Romantica 24",categoria:"Potrillo",alimentos:[],loteId:"R4",fechaIngreso:"",peso:"",color:""},
+  {id:"P24022",nombre:"Bella Y Romantica 24",categoria:"Potrillos 2024",alimentos:[],loteId:"R4",fechaIngreso:"",peso:"",color:""},
 ];
 
 // ── Cuida sin categoría ──────────────────────────────────────────────────────
@@ -370,8 +370,8 @@ const initLotes = [
   { id:"A4",   nombre:"A4",    hectareas:1.5,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"A5",   nombre:"A5",    hectareas:2.3,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"A6",   nombre:"A6",    hectareas:2.4,  ultimaDesmalezada:"2026-05-11", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
-  { id:"B1",   nombre:"B1",    hectareas:0.8,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
-  { id:"B1A",  nombre:"B1 A",  hectareas:2.5,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
+  { id:"B1",   nombre:"B1 A",    hectareas:0.8,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
+  { id:"B1A",  nombre:"B1",  hectareas:2.5,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"B2",   nombre:"B2",    hectareas:3.4,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"B3",   nombre:"B3",    hectareas:3.6,  ultimaDesmalezada:null,         notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
   { id:"B4",   nombre:"B4",    hectareas:3.5,  ultimaDesmalezada:"2026-05-04", notas:"", ultimaSiembra:"", queSembro:"", fechaVacio:null, intervenciones:[], lluvias:[], tieneRiego:false, riegoDiario:0 },
@@ -429,37 +429,37 @@ const initCaballos = [
   cab("YM011","Taylor Rae","BAJA","2026-04-28",0), cab("YM012","Queen Sarah","BAJA","2026-04-28",0), cab("YM013","Lady Thea","BAJA","2026-04-28",0),
   cab("YM014","Miss Tracy Bond","BAJA","2026-04-28",0), cab("YM015","Tweedia","F7","2026-04-28",0), cab("YM016","Opium Ruler","BAJA","2026-04-28",0),
   cab("YM017","Kirshara","BAJA","2026-04-28",0),
-  {id:"YM018",nombre:"Neska Amada 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-05",peso:262,color:""}, {id:"YM019",nombre:"Archie Fan 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-25",peso:265,color:""}, {id:"YM020",nombre:"Pleasant Legends 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-18",peso:289,color:""},
-  {id:"YM021",nombre:"Destiny Match 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-04",peso:291,color:""}, {id:"YM022",nombre:"Ishka Baja 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-19",peso:269,color:""}, {id:"YM023",nombre:"Issolda 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-09-14",peso:325,color:""},
-  {id:"YM024",nombre:"Bella Y Romantica 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-17",peso:280,color:""}, {id:"YM025",nombre:"Shafe 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-25",peso:304,color:""}, cab("YM026","Summer Fashion","B5","2026-04-28",0),
+  {id:"YM018",nombre:"Neska Amada 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-05",peso:262,color:""}, {id:"YM019",nombre:"Archie Fan 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-25",peso:265,color:""}, {id:"YM020",nombre:"Pleasant Legends 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-18",peso:289,color:""},
+  {id:"YM021",nombre:"Destiny Match 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-04",peso:291,color:""}, {id:"YM022",nombre:"Ishka Baja 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-19",peso:269,color:""}, {id:"YM023",nombre:"Issolda 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-09-14",peso:325,color:""},
+  {id:"YM024",nombre:"Bella Y Romantica 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-09-17",peso:280,color:""}, {id:"YM025",nombre:"Shafe 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-25",peso:304,color:""}, cab("YM026","Summer Fashion","B5","2026-04-28",0),
   cab("YM027","Calma Romana","F9","2026-04-24",0), cab("YM028","Ven A Mi","BAJA","2026-04-24",0), cab("YM029","Abbuehl","F9","2026-04-24",0),
-  cab("YM030","Leopolda Magna","F9","2026-04-24",0), cab("YM031","Break Of Day","F9","2026-04-24",0), {id:"YM032",nombre:"Candy Embrujada 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-17",peso:310,color:""},
+  cab("YM030","Leopolda Magna","F9","2026-04-24",0), cab("YM031","Break Of Day","F9","2026-04-24",0), {id:"YM032",nombre:"Candy Embrujada 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-17",peso:310,color:""},
   cab("YM033","Wonderful Luck","F9","2026-04-24",0), cab("YM034","Brig","F9","2026-04-24",0), cab("YM035","Fever Tap","F9","2026-04-24",0),
-  cab("YM036","Wallapop","F9","2026-04-24",0), {id:"YM037",nombre:"Spuki Inc 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-07-13",peso:320,color:""}, {id:"YM038",nombre:"Summer Rae 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-30",peso:308,color:""},
-  {id:"YM039",nombre:"Hai Plus 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-02",peso:275,color:""}, {id:"YM040",nombre:"Sumi Jo 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:301,color:""},
+  cab("YM036","Wallapop","F9","2026-04-24",0), {id:"YM037",nombre:"Spuki Inc 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-07-13",peso:320,color:""}, {id:"YM038",nombre:"Summer Rae 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-07-30",peso:308,color:""},
+  {id:"YM039",nombre:"Hai Plus 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-02",peso:275,color:""}, {id:"YM040",nombre:"Sumi Jo 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:301,color:""},
   cab("YM041","Fancy Indy","A6","2026-04-08",0), cab("YM042","Sola Para Ti","A6","2026-04-08",0),
-  {id:"YM043",nombre:"Opera Pagliacci 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-12",peso:302,color:""}, cab("YM044","Island Moon","B2","2026-04-24",0),
-  {id:"YM045",nombre:"Titanium Sale 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-04",peso:320,color:""}, {id:"YM046",nombre:"Nayla Sam 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-23",peso:324,color:""},
-  {id:"YM047",nombre:"Cala Celeste 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-13",peso:306,color:""}, {id:"YM048",nombre:"Champein 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-22",peso:310,color:""}, {id:"YM049",nombre:"Lola Chai 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-23",peso:320,color:""},
-  {id:"YM050",nombre:"Carneggie Mellon 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-12",peso:347,color:""}, cab("YM051","La Unica Dama","B4","",0), cab("YM052","Accionada Cosmica","B4","",0),
-  {id:"YM053",nombre:"Thaddea 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-28",peso:297,color:""}, {id:"YM054",nombre:"Sol Y Sol 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-07-23",peso:334,color:""}, {id:"YM055",nombre:"Niquelada Rye 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-25",peso:314,color:""},
-  {id:"YM056",nombre:"Indiana Catcher 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-27",peso:290,color:""}, {id:"YM057",nombre:"Summer Violence 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-06",peso:302,color:""}, {id:"YM058",nombre:"Bally Lee 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-25",peso:319,color:""},
+  {id:"YM043",nombre:"Opera Pagliacci 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-12",peso:302,color:""}, cab("YM044","Island Moon","B2","2026-04-24",0),
+  {id:"YM045",nombre:"Titanium Sale 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-04",peso:320,color:""}, {id:"YM046",nombre:"Nayla Sam 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-23",peso:324,color:""},
+  {id:"YM047",nombre:"Cala Celeste 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-13",peso:306,color:""}, {id:"YM048",nombre:"Champein 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-22",peso:310,color:""}, {id:"YM049",nombre:"Lola Chai 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-23",peso:320,color:""},
+  {id:"YM050",nombre:"Carneggie Mellon 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-12",peso:347,color:""}, cab("YM051","La Unica Dama","B4","",0), cab("YM052","Accionada Cosmica","B4","",0),
+  {id:"YM053",nombre:"Thaddea 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-28",peso:297,color:""}, {id:"YM054",nombre:"Sol Y Sol 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-07-23",peso:334,color:""}, {id:"YM055",nombre:"Niquelada Rye 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-25",peso:314,color:""},
+  {id:"YM056",nombre:"Indiana Catcher 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-27",peso:290,color:""}, {id:"YM057",nombre:"Summer Violence 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-06",peso:302,color:""}, {id:"YM058",nombre:"Bally Lee 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-25",peso:319,color:""},
   cab("YM059","Sandrin","B6","2026-04-24",0), cab("YM060","Carmen Embrujada","B6","2026-04-24",0), cab("YM061","Cheating Girl","B6","2026-04-24",0),
   cab("YM062","Joy Niagara","B6","2026-04-24",0), cab("YM063","Laudemio","B6","2026-04-24",0), cab("YM064","Tapitai","B6","2026-04-24",0),
   cab("YM065","Jazz Banda","B6","2026-04-24",0), cab("YM066","Financial Aid","B6","2026-04-24",0), cab("YM067","Acces Code","B6","2026-04-24",0),
-  cab("YM068","Angelic Air","BAJO","2026-04-24",0), cab("YM069","Christofle","BAJO","2026-04-24",0), {id:"YM070",nombre:"Wengen 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-04",peso:320,color:""},
-  {id:"YM071",nombre:"Opera Lilly 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-09-29",peso:289,color:""}, {id:"YM072",nombre:"Distar 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-12",peso:283,color:""}, cab("YM073","La Hipnosis","BAJO","2026-04-24",0),
-  {id:"YM074",nombre:"Black Ice 25",categoria:"Potranca",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-11",peso:314,color:""}, {id:"YM075",nombre:"Orpen Look 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-25",peso:325,color:""}, {id:"YM076",nombre:"Pura Chispa 25",categoria:"Potranca",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-03",peso:292,color:""},
+  cab("YM068","Angelic Air","BAJO","2026-04-24",0), cab("YM069","Christofle","BAJO","2026-04-24",0), {id:"YM070",nombre:"Wengen 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-04",peso:320,color:""},
+  {id:"YM071",nombre:"Opera Lilly 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-09-29",peso:289,color:""}, {id:"YM072",nombre:"Distar 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-12",peso:283,color:""}, cab("YM073","La Hipnosis","BAJO","2026-04-24",0),
+  {id:"YM074",nombre:"Black Ice 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SMEDIO",fechaIngreso:"2025-08-11",peso:314,color:""}, {id:"YM075",nombre:"Orpen Look 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-08-25",peso:325,color:""}, {id:"YM076",nombre:"Pura Chispa 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R2",fechaIngreso:"2025-08-03",peso:292,color:""},
   cab("YM077","Luminosa Candy","GALPUZ","2026-04-24",0), cab("YM078","Dona Lea","BAJO","2026-04-24",0), cab("YM079","Chispitas","BAJO","2026-04-24",0),
   cab("YM080","Schweigen","BAJO","2026-04-24",0), cab("YM081","Crackdown","BAJO","2026-04-24",0),
-  {id:"YM082",nombre:"Summer Freedom 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-09",peso:272,color:""}, {id:"YM083",nombre:"Dobrinka 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-20",peso:233,color:""}, {id:"YM084",nombre:"American Voodoo 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-25",peso:196,color:""},
-  {id:"YM085",nombre:"Miss Lute 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-11-10",peso:242,color:""}, {id:"YM086",nombre:"Tarotista 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-22",peso:261,color:""}, {id:"YM087",nombre:"Nina Berstein 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-21",peso:280,color:""},
-  cab("YM088","Calshot","B3","",0), {id:"YM089",nombre:"Fisher Pond 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-19",peso:302,color:""}, cab("YM090","American Girl","B3","",0),
-  {id:"YM091",nombre:"Ready N Waiting 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-16",peso:232,color:""}, cab("YM092","Salome Scent","B3","",0), {id:"YM093",nombre:"Chispita 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:305,color:""},
-  {id:"YM094",nombre:"Summer Force 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-29",peso:246,color:""}, {id:"YM095",nombre:"Miss Oasis 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-19",peso:233,color:""}, {id:"YM096",nombre:"Brangelina 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-03",peso:259,color:""},
-  {id:"YM097",nombre:"La Busanda 25",categoria:"Potranca",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-12",peso:238,color:""}, {id:"YM098",nombre:"Dona Bibi 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-20",peso:255,color:""}, {id:"YM099",nombre:"La Nicanora 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-31",peso:298,color:""},
-  {id:"YM100",nombre:"Swiss Candy 25",categoria:"Potranca",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-02",peso:287,color:""}, {id:"YM101",nombre:"Fantasy In Blue 25",categoria:"Potranca",alimentos:[],loteId:"S31",fechaIngreso:"2025-09-27",peso:300,color:""}, {id:"YM102",nombre:"Wild Wild Luck 25",categoria:"Potranca",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-24",peso:259,color:""},
-  {id:"YM103",nombre:"Amelie Embrujada 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-23",peso:262,color:""}, {id:"YM104",nombre:"Perfect Melody 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-26",peso:265,color:""}, {id:"YM105",nombre:"Miss Shaun 25",categoria:"Potranca",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-29",peso:223,color:""},
+  {id:"YM082",nombre:"Summer Freedom 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-09",peso:272,color:""}, {id:"YM083",nombre:"Dobrinka 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-20",peso:233,color:""}, {id:"YM084",nombre:"American Voodoo 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-10-25",peso:196,color:""},
+  {id:"YM085",nombre:"Miss Lute 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-11-10",peso:242,color:""}, {id:"YM086",nombre:"Tarotista 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-22",peso:261,color:""}, {id:"YM087",nombre:"Nina Berstein 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-21",peso:280,color:""},
+  cab("YM088","Calshot","B3","",0), {id:"YM089",nombre:"Fisher Pond 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-19",peso:302,color:""}, cab("YM090","American Girl","B3","",0),
+  {id:"YM091",nombre:"Ready N Waiting 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-16",peso:232,color:""}, cab("YM092","Salome Scent","B3","",0), {id:"YM093",nombre:"Chispita 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-08-02",peso:305,color:""},
+  {id:"YM094",nombre:"Summer Force 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-29",peso:246,color:""}, {id:"YM095",nombre:"Miss Oasis 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-19",peso:233,color:""}, {id:"YM096",nombre:"Brangelina 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-03",peso:259,color:""},
+  {id:"YM097",nombre:"La Busanda 25",categoria:"Potrillos 2025",alimentos:[],loteId:"SARROYO",fechaIngreso:"2025-10-12",peso:238,color:""}, {id:"YM098",nombre:"Dona Bibi 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-20",peso:255,color:""}, {id:"YM099",nombre:"La Nicanora 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-07-31",peso:298,color:""},
+  {id:"YM100",nombre:"Swiss Candy 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S41",fechaIngreso:"2025-09-02",peso:287,color:""}, {id:"YM101",nombre:"Fantasy In Blue 25",categoria:"Potrillos 2025",alimentos:[],loteId:"S31",fechaIngreso:"2025-09-27",peso:300,color:""}, {id:"YM102",nombre:"Wild Wild Luck 25",categoria:"Potrillos 2025",alimentos:[],loteId:"R3",fechaIngreso:"2025-09-24",peso:259,color:""},
+  {id:"YM103",nombre:"Amelie Embrujada 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-23",peso:262,color:""}, {id:"YM104",nombre:"Perfect Melody 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-26",peso:265,color:""}, {id:"YM105",nombre:"Miss Shaun 25",categoria:"Potrillos 2025",alimentos:[],loteId:"BAJO",fechaIngreso:"2025-10-29",peso:223,color:""},
   cab("YM106","Dream Tim","81","2026-04-24",0), cab("YM107","Air Groove","81","2026-04-24",0), cab("YM108","Kalavana","81","2026-04-24",0),
   cab("YM109","Eslovenia","81","2026-04-24",0), cab("YM110","Sonetta","81","2026-04-24",0), cab("YM111","Torgau","81","2026-04-24",0),
   cab("YM112","Carta Ganadora","F5","2026-04-24",0), cab("YM113","Girona Fever","81","2026-04-24",0),
@@ -477,36 +477,36 @@ const initMovimientos = [
   // 21/5 - B3 -> Bajo
   {id:"MOV001",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Angelic Air",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV002",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Chispitas",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV003",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Wengen 25",cantidad:1,categoria:"Potranca",loteOrigen:"R2",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV004",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Orpen Look 25",cantidad:1,categoria:"Potranca",loteOrigen:"S31",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV003",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Wengen 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"R2",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV004",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Orpen Look 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"S31",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV005",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Christofle",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV006",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"La Hipnosis",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV007",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Black Ice 25",cantidad:1,categoria:"Potranca",loteOrigen:"SMEDIO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV007",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Black Ice 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"SMEDIO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV008",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Dona Lea",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV009",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Schweigen",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV010",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Pura Chispa 25",cantidad:1,categoria:"Potranca",loteOrigen:"R2",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV010",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Pura Chispa 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"R2",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   {id:"MOV011",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Crackdown",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV012",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Distar 25",cantidad:1,categoria:"Potranca",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV013",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Miss Lute 25",cantidad:1,categoria:"Potranca",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV014",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Brangelina 25",cantidad:1,categoria:"Potranca",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
-  {id:"MOV015",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Pura Firma 25",cantidad:1,categoria:"Potranca",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV012",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Distar 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV013",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Miss Lute 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV014",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Brangelina 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
+  {id:"MOV015",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Pura Firma 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"BAJO",loteDestino:"BAJO",motivo:"Rotación",notas:""},
   // 21/5 - Artena ingresa a B6
   {id:"MOV016",fecha:"2026-05-21",tipo:"individual",caballoId:"YM118",caballoNombre:"Artena",cantidad:1,categoria:"Yegua madre",loteOrigen:null,loteDestino:"B6",motivo:"Ingreso al haras",notas:""},
   // 21/5 - F5 -> B3
-  {id:"MOV017",fecha:"2026-05-21",tipo:"individual",caballoId:"YM119",caballoNombre:"Jolly Land",cantidad:1,categoria:"Potranca",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
-  {id:"MOV018",fecha:"2026-05-21",tipo:"individual",caballoId:"YM120",caballoNombre:"Leading The Group",cantidad:1,categoria:"Potranca",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
-  {id:"MOV019",fecha:"2026-05-21",tipo:"individual",caballoId:"YM121",caballoNombre:"Tampa Dream",cantidad:1,categoria:"Potranca",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
-  {id:"MOV020",fecha:"2026-05-21",tipo:"individual",caballoId:"YM122",caballoNombre:"Sailing Queen",cantidad:1,categoria:"Potranca",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
+  {id:"MOV017",fecha:"2026-05-21",tipo:"individual",caballoId:"YM119",caballoNombre:"Jolly Land",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
+  {id:"MOV018",fecha:"2026-05-21",tipo:"individual",caballoId:"YM120",caballoNombre:"Leading The Group",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
+  {id:"MOV019",fecha:"2026-05-21",tipo:"individual",caballoId:"YM121",caballoNombre:"Tampa Dream",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
+  {id:"MOV020",fecha:"2026-05-21",tipo:"individual",caballoId:"YM122",caballoNombre:"Sailing Queen",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"F5",loteDestino:"B3",motivo:"Rotación",notas:""},
   // 21/5 - 8.5 -> Box/Cuida
-  {id:"MOV021",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Tafari",cantidad:1,categoria:"Potrillo",loteOrigen:"85",loteDestino:"BOXCUIDA",motivo:"Ingresa a box en la cuida",notas:""},
-  {id:"MOV022",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Cocorito Sham",cantidad:1,categoria:"Potrillo",loteOrigen:"85",loteDestino:"BOXCUIDA",motivo:"Ingresa a box en la cuida",notas:""},
+  {id:"MOV021",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Tafari",cantidad:1,categoria:"Potrillos 2024",loteOrigen:"85",loteDestino:"BOXCUIDA",motivo:"Ingresa a box en la cuida",notas:""},
+  {id:"MOV022",fecha:"2026-05-21",tipo:"individual",caballoId:null,caballoNombre:"Cocorito Sham",cantidad:1,categoria:"Potrillos 2024",loteOrigen:"85",loteDestino:"BOXCUIDA",motivo:"Ingresa a box en la cuida",notas:""},
   // 21/5 - S41 -> SArroyo
-  {id:"MOV023",fecha:"2026-05-21",tipo:"individual",caballoId:"YM123",caballoNombre:"Brig 2025",cantidad:1,categoria:"Potranca",loteOrigen:"S41",loteDestino:"SARROYO",motivo:"Ingreso",notas:""},
-  {id:"MOV024",fecha:"2026-05-21",tipo:"individual",caballoId:"YM124",caballoNombre:"Summer Fashion 2025",cantidad:1,categoria:"Potranca",loteOrigen:"S41",loteDestino:"SARROYO",motivo:"Ingreso",notas:""},
+  {id:"MOV023",fecha:"2026-05-21",tipo:"individual",caballoId:"YM123",caballoNombre:"Brig 2025",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"S41",loteDestino:"SARROYO",motivo:"Ingreso",notas:""},
+  {id:"MOV024",fecha:"2026-05-21",tipo:"individual",caballoId:"YM124",caballoNombre:"Summer Fashion 2025",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"S41",loteDestino:"SARROYO",motivo:"Ingreso",notas:""},
   // 21/5 - SArroyo -> R3
-  {id:"MOV025",fecha:"2026-05-21",tipo:"individual",caballoId:"YM125",caballoNombre:"Dobrinka 2025",cantidad:1,categoria:"Potranca",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
-  {id:"MOV026",fecha:"2026-05-21",tipo:"individual",caballoId:"YM126",caballoNombre:"American Voodoo 2025",cantidad:1,categoria:"Potranca",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
-  {id:"MOV027",fecha:"2026-05-21",tipo:"individual",caballoId:"YM127",caballoNombre:"Summer Freedom 2025",cantidad:1,categoria:"Potranca",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
+  {id:"MOV025",fecha:"2026-05-21",tipo:"individual",caballoId:"YM125",caballoNombre:"Dobrinka 2025",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
+  {id:"MOV026",fecha:"2026-05-21",tipo:"individual",caballoId:"YM126",caballoNombre:"American Voodoo 2025",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
+  {id:"MOV027",fecha:"2026-05-21",tipo:"individual",caballoId:"YM127",caballoNombre:"Summer Freedom 2025",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"SARROYO",loteDestino:"R3",motivo:"Rotación",notas:""},
   // 22/5 - Bajas del haras F7
   {id:"MOV028",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Opium Ruler",cantidad:1,categoria:"Yegua madre",loteOrigen:"F7",loteDestino:null,motivo:"Baja del haras",notas:""},
   {id:"MOV029",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Taylor Rae",cantidad:1,categoria:"Yegua madre",loteOrigen:"F7",loteDestino:null,motivo:"Baja del haras",notas:""},
@@ -518,7 +518,7 @@ const initMovimientos = [
   {id:"MOV035",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Star Of Belen",cantidad:1,categoria:"Yegua madre",loteOrigen:"F7",loteDestino:null,motivo:"Baja del haras",notas:""},
   // 22/5 - Bajas F9 y F8
   {id:"MOV036",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Ven A Mi",cantidad:1,categoria:"Yegua madre",loteOrigen:"F9",loteDestino:null,motivo:"Baja del haras",notas:""},
-  {id:"MOV037",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Archie Fan 25",cantidad:1,categoria:"Potranca",loteOrigen:"F8",loteDestino:null,motivo:"Baja del haras",notas:""},
+  {id:"MOV037",fecha:"2026-05-22",tipo:"individual",caballoId:null,caballoNombre:"Archie Fan 25",cantidad:1,categoria:"Potrillos 2025",loteOrigen:"F8",loteDestino:null,motivo:"Baja del haras",notas:""},
   // 23/5 - Luminosa Candy -> Galpon de Luz
   {id:"MOV038",fecha:"2026-05-23",tipo:"individual",caballoId:null,caballoNombre:"Luminosa Candy",cantidad:1,categoria:"Yegua madre",loteOrigen:"B6",loteDestino:"GALPUZ",motivo:"Corral en el Galpón de Luz",notas:""},
 ];
@@ -2121,7 +2121,7 @@ export default function HarasApp(){
                 <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16,alignItems:"center"}}>
                   <input className="fi" style={{flex:1,minWidth:200,marginBottom:0}} value={filtroCabNombre} onChange={e=>setFiltroCabNombre(e.target.value)} placeholder="🔍 Buscar por nombre…"/>
                   <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                    {["","Yegua madre","Yegua vacía","Potranca","Potrillo","Padrillo"].map(cat=>(
+                    {["","Yegua madre","Yegua vacía","Potrillos 2025","Potrillos 2024","Padrillo"].map(cat=>(
                       <button key={cat} onClick={()=>setFiltroCat(cat)} style={{padding:"6px 12px",borderRadius:8,border:`1px solid ${filtroCat===cat?"#8B6000":"#e0ddd8"}`,background:filtroCat===cat?"#8B6000":"#fff",color:filtroCat===cat?"#fff":"#333",fontWeight:600,fontSize:12,cursor:"pointer"}}>
                         {cat||"Todas"}
                       </button>
