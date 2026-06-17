@@ -253,7 +253,7 @@ const STOCK_HISTORIAL = {
   "F6":     [{f:"2026-04-28",cat:"Sin cría",ent:9,sal:0,tot:9},{f:"2026-05-13",cat:"—",ent:null,sal:null,tot:7}],
   "F7":     [{f:"2026-04-28",cat:"Sin cría",ent:10,sal:0,tot:10}],
   "F8":     [{f:"2026-04-28",cat:"Preñadas",ent:9,sal:0,tot:9}],
-  "F9":     [{f:"2026-04-24",cat:"Sin cría (ingreso)",ent:10,sal:0,tot:10,esAlta:true},{f:"2026-04-28",cat:"—",ent:0,sal:10,tot:0},{f:"2026-05-12",cat:"Preñadas",ent:null,sal:null,tot:14}],
+  "F9":     [{f:"2026-04-24",cat:"Sin cría (ingreso)",ent:10,sal:0,tot:10,esAlta:true},{f:"2026-04-28",cat:"—",ent:0,sal:10,tot:0}],
   "F10":    [{f:"2026-04-08",cat:"Potrillos 7 meses",ent:12,sal:0,tot:12},{f:"2026-05-13",cat:"—",ent:null,sal:null,tot:0}],
   "F12":    [{f:"2026-05-13",cat:"Potrancas 18 meses",ent:null,sal:null,tot:3}],
   "F13":    [{f:"2026-04-08",cat:"Potrancas 2 años",ent:3,sal:0,tot:3}],
