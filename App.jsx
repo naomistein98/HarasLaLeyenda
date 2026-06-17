@@ -1523,12 +1523,16 @@ export default function HarasApp(){
   }
 
   function saveMovimiento(mov){
-    const newMov={...mov, id:"MOV"+Date.now()};
+    const newMov={...mov, id:"MOV"+Date.now()+"_"+Math.random().toString(36).slice(2,7)};
     setMovimientos(prev=>[...prev,newMov]);
-    // Update caballos loteId if named animal
+    // Update caballos loteId if named animal - use functional update to avoid stale closures
     if(newMov.caballoId){
-      setCaballos(prev=>prev.map(c=>c.id===newMov.caballoId?{...c,loteId:newMov.loteDestino,fechaIngreso:newMov.fecha}:c));
-      saveCaballoToDb({...caballos.find(c=>c.id===newMov.caballoId),loteId:newMov.loteDestino,fechaIngreso:newMov.fecha});
+      setCaballos(prev=>{
+        const updated = prev.map(c=>c.id===newMov.caballoId?{...c,loteId:newMov.loteDestino,fechaIngreso:newMov.fecha}:c);
+        const cabActualizado = updated.find(c=>c.id===newMov.caballoId);
+        if(cabActualizado) saveCaballoToDb(cabActualizado);
+        return updated;
+      });
     }
     sbUpsert("movimientos",[{
       id:newMov.id, fecha:newMov.fecha, tipo:newMov.tipo,
