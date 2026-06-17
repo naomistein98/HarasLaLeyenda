@@ -665,7 +665,6 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
   const [paso,setPaso]=useState(1);
   const [cantidad,setCantidad]=useState("");
   const [categoria,setCategoria]=useState("");
-  const [tieneNombre,setTieneNombre]=useState(null); // true | false
   const [busqueda,setBusqueda]=useState("");
   const [seleccionados,setSeleccionados]=useState([]); // ids
   const [loteOrigen,setLoteOrigen]=useState("");
@@ -684,9 +683,22 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
     setSeleccionados(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
   }
 
+  // Auto-fill loteOrigen from selected named animals (if all share the same current lote)
+  React.useEffect(()=>{
+    if(seleccionados.length>0 && !loteOrigen){
+      const lotesActuales = seleccionados.map(id=>caballos.find(c=>c.id===id)?.loteId).filter(Boolean);
+      const unicos = [...new Set(lotesActuales)];
+      if(unicos.length===1){
+        setLoteOrigen(unicos[0]);
+      }
+    }
+  },[seleccionados]);
+
   function save(){
     if(!loteDestino) return;
-    if(tieneNombre && seleccionados.length>0){
+    if(!loteOrigen) return; // require explicit confirmation
+    const loteOrigenFinal = loteOrigen==="__nuevo__" ? null : loteOrigen;
+    if(seleccionados.length>0){
       // Save one movimiento per named animal
       seleccionados.forEach(id=>{
         const cab=caballos.find(c=>c.id===id);
@@ -694,7 +706,7 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
           fecha, tipo:"individual",
           caballoId:id, caballoNombre:cab?.nombre||"",
           cantidad:1, categoria:cab?.categoria||categoria,
-          loteOrigen:loteOrigen||null, loteDestino,
+          loteOrigen:loteOrigenFinal, loteDestino,
           motivo, notas,
         });
       });
@@ -704,14 +716,14 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
         fecha, tipo:"grupo",
         caballoId:null, caballoNombre:null,
         cantidad:parseInt(cantidad)||1, categoria,
-        loteOrigen:loteOrigen||null, loteDestino,
+        loteOrigen:loteOrigenFinal, loteDestino,
         motivo, notas,
       });
     }
     closeModal();
   }
 
-  const pasoTitle=["","1 · Cantidad y categoría","2 · ¿Tienen nombre?","3 · Seleccionar animales","4 · Lotes y fecha"][paso]||"";
+  const pasoTitle=["","1 · Cantidad y categoría","2 · Seleccionar animales","3 · Lotes y fecha"][paso]||"";
 
   return(
     <div className="mo" onClick={e=>e.target===e.currentTarget&&closeModal()}>
@@ -744,29 +756,8 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
           </div>
         )}
 
-        {/* Paso 2: ¿Tienen nombre? */}
+        {/* Paso 2: Seleccionar animales */}
         {paso===2&&(
-          <div>
-            <div style={{marginBottom:16,fontSize:14,color:"#333",fontWeight:600}}>
-              ¿Los {cantidad} {categoria} que se mueven tienen nombre registrado en el sistema?
-            </div>
-            <div className="cg" style={{marginBottom:24}}>
-              <label className={`ci ${tieneNombre===true?"ck":""}`} style={{padding:"14px 20px",fontSize:14}}>
-                <input type="radio" onChange={()=>setTieneNombre(true)}/> Sí, tienen nombre
-              </label>
-              <label className={`ci ${tieneNombre===false?"ck":""}`} style={{padding:"14px 20px",fontSize:14}}>
-                <input type="radio" onChange={()=>setTieneNombre(false)}/> No, sin nombre
-              </label>
-            </div>
-            <div className="fb g2p" style={{justifyContent:"space-between"}}>
-              <button className="btn bg" onClick={()=>setPaso(1)}>← Atrás</button>
-              <button className="btn bp" disabled={tieneNombre===null} onClick={()=>setPaso(tieneNombre?3:4)}>Siguiente →</button>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 3: Seleccionar por nombre */}
-        {paso===3&&(
           <div>
             <div className="fg">
               <label className="fl">Buscar animal</label>
@@ -788,20 +779,37 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
               }
             </div>
             <div className="fb g2p" style={{marginTop:16,justifyContent:"space-between"}}>
-              <button className="btn bg" onClick={()=>setPaso(2)}>← Atrás</button>
-              <button className="btn bp" disabled={seleccionados.length===0} onClick={()=>setPaso(4)}>Siguiente → ({seleccionados.length})</button>
+              <button className="btn bg" onClick={()=>setPaso(1)}>← Atrás</button>
+              <button className="btn bp" disabled={seleccionados.length===0} onClick={()=>setPaso(3)}>Siguiente → ({seleccionados.length})</button>
             </div>
           </div>
         )}
 
-        {/* Paso 4: Lotes y fecha */}
-        {paso===4&&(
+        {/* Paso 3: Lotes y fecha */}
+        {paso===3&&(
           <div>
+            {seleccionados.length>0 && (()=>{
+              const lotesActuales = seleccionados.map(id=>caballos.find(c=>c.id===id)?.loteId).filter(Boolean);
+              const unicos = [...new Set(lotesActuales)];
+              const nombreLoteActual = unicos.length===1 ? lotes.find(l=>l.id===unicos[0])?.nombre : null;
+              if(unicos.length>1){
+                return <div style={{background:"#fff3cd",border:"1px solid #e0c040",borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#665000"}}>
+                  ⚠️ Los animales seleccionados están en lotes distintos actualmente. Confirmá el lote de origen correcto antes de continuar.
+                </div>;
+              }
+              if(nombreLoteActual && loteOrigen===unicos[0]){
+                return <div style={{background:"#e8f5e8",border:"1px solid #a0d080",borderRadius:8,padding:"10px 14px",marginBottom:14,fontSize:13,color:"#2d5a00"}}>
+                  ✓ Confirmado: estos animales están actualmente en <strong>{nombreLoteActual}</strong>.
+                </div>;
+              }
+              return null;
+            })()}
             <div className="fr">
               <div className="fg">
-                <label className="fl">Lote origen</label>
+                <label className="fl">Lote origen *</label>
                 <select className="fi" value={loteOrigen} onChange={e=>setLoteOrigen(e.target.value)}>
-                  <option value="">— Ingreso nuevo al campo —</option>
+                  <option value="">— Confirmá el lote de origen —</option>
+                  <option value="__nuevo__">Ingreso nuevo al campo (sin origen)</option>
                   {lotes.map(l=><option key={l.id} value={l.id}>{l.nombre}</option>)}
                 </select>
               </div>
@@ -828,13 +836,13 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
             {/* Resumen */}
             <div style={{background:"#f5f9f0",borderRadius:8,padding:"10px 14px",marginBottom:16,fontSize:13}}>
               <div style={{fontWeight:700,marginBottom:4}}>Resumen:</div>
-              <div>{tieneNombre?`${seleccionados.length} animales seleccionados`:`${cantidad} ${categoria} sin nombre`}</div>
+              <div>{seleccionados.length} animales seleccionados</div>
               {loteOrigen&&<div>Desde: <strong>{lotes.find(l=>l.id===loteOrigen)?.nombre}</strong></div>}
               <div>Hacia: <strong>{lotes.find(l=>l.id===loteDestino)?.nombre||"—"}</strong></div>
             </div>
             <div className="fb g2p" style={{justifyContent:"space-between"}}>
-              <button className="btn bg" onClick={()=>setPaso(tieneNombre?3:2)}>← Atrás</button>
-              <button className="btn bp" disabled={!loteDestino} onClick={save}>✓ Registrar movimiento</button>
+              <button className="btn bg" onClick={()=>setPaso(2)}>← Atrás</button>
+              <button className="btn bp" disabled={!loteDestino||!loteOrigen} onClick={save}>✓ Registrar movimiento</button>
             </div>
           </div>
         )}
