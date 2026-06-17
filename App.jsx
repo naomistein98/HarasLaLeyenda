@@ -2532,10 +2532,8 @@ export default function HarasApp(){
                     const fecha=document.getElementById("trasladoFecha").value||hoy();
                     const motivo=document.getElementById("trasladoMotivo").value;
                     if(!destino) return;
-                    setConfirmAction({
-                      mensaje:`Vas a trasladar ${animales.length} animales de ${loteOrig.nombre} a ${lotes.find(l=>l.id===destino)?.nombre}. ¿Confirmás?`,
-                      onConfirm:()=>{ trasladarLoteCompleto(showTrasladoLote, destino, fecha, motivo); setShowTrasladoLote(null); }
-                    });
+                    trasladarLoteCompleto(showTrasladoLote, destino, fecha, motivo);
+                    setShowTrasladoLote(null);
                   }}>✓ Trasladar todos</button>
                 </div>
               </div>
