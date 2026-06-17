@@ -684,7 +684,7 @@ function MovimientoModal({lotes,caballos,CATEGORIAS,saveMovimiento,closeModal,ho
   }
 
   // Auto-fill loteOrigen from selected named animals (if all share the same current lote)
-  React.useEffect(()=>{
+  useEffect(()=>{
     if(seleccionados.length>0 && !loteOrigen){
       const lotesActuales = seleccionados.map(id=>caballos.find(c=>c.id===id)?.loteId).filter(Boolean);
       const unicos = [...new Set(lotesActuales)];
