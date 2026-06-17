@@ -1021,6 +1021,8 @@ export default function HarasApp(){
   const [filtroLoteNombre,setFiltroLoteNombre]=useState(""); // search lotes by nombre
   const [filtroLoteTipo,setFiltroLoteTipo]=useState(""); // filter lotes by cultivo type
   const [confirmAction,setConfirmAction]=useState(null); // {mensaje, onConfirm}
+  const [showTrasladoLote,setShowTrasladoLote]=useState(null); // loteId origen
+  const [showMoverCaballo,setShowMoverCaballo]=useState(null); // {caballoId, loteOrigen}
   const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
   // Current effective values (latest entry per cultivo/mes or categoria)
@@ -1546,6 +1548,33 @@ export default function HarasApp(){
     }]);
   }
 
+  function trasladarLoteCompleto(loteOrigenId, loteDestinoId, fecha, motivo){
+    const animales = cabsDe(loteOrigenId);
+    animales.forEach(c=>{
+      saveMovimiento({
+        fecha, tipo:"individual",
+        caballoId:c.id, caballoNombre:c.nombre,
+        cantidad:1, categoria:c.categoria,
+        loteOrigen:loteOrigenId, loteDestino:loteDestinoId,
+        motivo:motivo||"Traslado completo del lote", notas:"",
+      });
+    });
+    showToast(`✓ ${animales.length} animales trasladados`);
+  }
+
+  function moverCaballoIndividual(caballoId, loteOrigenId, loteDestinoId, fecha, motivo){
+    const cab = caballos.find(c=>c.id===caballoId);
+    if(!cab) return;
+    saveMovimiento({
+      fecha, tipo:"individual",
+      caballoId:cab.id, caballoNombre:cab.nombre,
+      cantidad:1, categoria:cab.categoria,
+      loteOrigen:loteOrigenId, loteDestino:loteDestinoId,
+      motivo:motivo||"Rotación", notas:"",
+    });
+    showToast(`✓ ${cab.nombre} movido`);
+  }
+
   function saveDesm(){
     if(!desmPid)return;
     const newD={id:"D"+Date.now(),loteId:desmPid,fecha:fD.fecha,notas:fD.notas};
@@ -1938,7 +1967,10 @@ export default function HarasApp(){
                     <div className="card">
                       <div className="fbt mb3">
                         <div className="stit" style={{marginBottom:0}}>Animales actuales</div>
-                        <span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:24}}>{nTotal}</span>
+                        <div style={{display:"flex",alignItems:"center",gap:10}}>
+                          <span className="tg" style={{fontFamily:"Playfair Display,serif",fontSize:24}}>{nTotal}</span>
+                          {hs.length>0&&<button className="btn bg sm" onClick={()=>setShowTrasladoLote(l.id)}>⇄ Trasladar lote completo</button>}
+                        </div>
                       </div>
                       {nTotal===0
                         ?<div className="es" style={{padding:"24px 0"}}>Sin animales asignados</div>
@@ -1957,6 +1989,7 @@ export default function HarasApp(){
                                      <div style={{color:"#1a1410",fontWeight:500}}>{h.nombre}</div>
                                      <div className="tm txs">{h.categoria}{h.fechaIngreso?` · ${diasDesde(h.fechaIngreso)} días aquí`:""}</div>
                                    </div>
+                                   <button className="btn bg sm" style={{marginRight:8}} onClick={()=>setShowMoverCaballo({caballoId:h.id, loteOrigen:l.id})}>⇄ Mover</button>
                                    <span className="badge">{h.color||h.categoria}</span>
                                  </div>
                                ))}
@@ -2465,6 +2498,94 @@ export default function HarasApp(){
             </div>
           </div>
         )}
+        {/* MODAL: Trasladar lote completo */}
+        {showTrasladoLote&&(()=>{
+          const loteOrig=lotes.find(l=>l.id===showTrasladoLote);
+          if(!loteOrig) return null;
+          const animales=cabsDe(showTrasladoLote);
+          return(
+            <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowTrasladoLote(null)}>
+              <div className="md" style={{maxWidth:460}}>
+                <div className="mtit">⇄ Trasladar lote completo</div>
+                <div style={{fontSize:13,color:"#555",marginBottom:16}}>
+                  Vas a mover los <strong>{animales.length}</strong> animales de <strong>{loteOrig.nombre}</strong> a otro lote. Se registra como movimiento individual para cada uno.
+                </div>
+                <div className="fg">
+                  <label className="fl">Lote destino *</label>
+                  <select className="fi" id="trasladoDestino">
+                    <option value="">— Seleccionar —</option>
+                    {lotes.filter(l=>l.id!==showTrasladoLote).map(l=><option key={l.id} value={l.id}>{l.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="fg">
+                  <label className="fl">Fecha</label>
+                  <input className="fi" type="date" id="trasladoFecha" defaultValue={hoy()}/>
+                </div>
+                <div className="fg">
+                  <label className="fl">Motivo</label>
+                  <input className="fi" id="trasladoMotivo" placeholder="Ej: Rotación planificada"/>
+                </div>
+                <div className="fb g2p" style={{justifyContent:"space-between",marginTop:16}}>
+                  <button className="btn bg" onClick={()=>setShowTrasladoLote(null)}>Cancelar</button>
+                  <button className="btn bp" onClick={()=>{
+                    const destino=document.getElementById("trasladoDestino").value;
+                    const fecha=document.getElementById("trasladoFecha").value||hoy();
+                    const motivo=document.getElementById("trasladoMotivo").value;
+                    if(!destino) return;
+                    setConfirmAction({
+                      mensaje:`Vas a trasladar ${animales.length} animales de ${loteOrig.nombre} a ${lotes.find(l=>l.id===destino)?.nombre}. ¿Confirmás?`,
+                      onConfirm:()=>{ trasladarLoteCompleto(showTrasladoLote, destino, fecha, motivo); setShowTrasladoLote(null); }
+                    });
+                  }}>✓ Trasladar todos</button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* MODAL: Mover caballo individual desde el lote */}
+        {showMoverCaballo&&(()=>{
+          const cab=caballos.find(c=>c.id===showMoverCaballo.caballoId);
+          if(!cab) return null;
+          const loteOrig=lotes.find(l=>l.id===showMoverCaballo.loteOrigen);
+          return(
+            <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowMoverCaballo(null)}>
+              <div className="md" style={{maxWidth:420}}>
+                <div className="mtit">⇄ Mover a {cab.nombre}</div>
+                <div style={{fontSize:13,color:"#555",marginBottom:16}}>
+                  Actualmente en <strong>{loteOrig?.nombre||"—"}</strong>
+                </div>
+                <div className="fg">
+                  <label className="fl">Lote destino *</label>
+                  <select className="fi" id="moverDestino">
+                    <option value="">— Seleccionar —</option>
+                    {lotes.filter(l=>l.id!==showMoverCaballo.loteOrigen).map(l=><option key={l.id} value={l.id}>{l.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="fg">
+                  <label className="fl">Fecha</label>
+                  <input className="fi" type="date" id="moverFecha" defaultValue={hoy()}/>
+                </div>
+                <div className="fg">
+                  <label className="fl">Motivo</label>
+                  <input className="fi" id="moverMotivo" placeholder="Ej: Rotación"/>
+                </div>
+                <div className="fb g2p" style={{justifyContent:"space-between",marginTop:16}}>
+                  <button className="btn bg" onClick={()=>setShowMoverCaballo(null)}>Cancelar</button>
+                  <button className="btn bp" onClick={()=>{
+                    const destino=document.getElementById("moverDestino").value;
+                    const fecha=document.getElementById("moverFecha").value||hoy();
+                    const motivo=document.getElementById("moverMotivo").value;
+                    if(!destino) return;
+                    moverCaballoIndividual(showMoverCaballo.caballoId, showMoverCaballo.loteOrigen, destino, fecha, motivo);
+                    setShowMoverCaballo(null);
+                  }}>✓ Mover</button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* MODAL: Peso historial */}
         {showPesoModal&&(()=>{
           const cab=caballos.find(c=>c.id===showPesoModal);
