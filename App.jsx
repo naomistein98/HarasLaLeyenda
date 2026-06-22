@@ -1652,7 +1652,7 @@ export default function HarasApp(){
     closeModal();
   }
 
-  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"},{id:"movimientos",ic:"⇄",lb:"Movimientos"}];
+  const nav=[{id:"dashboard",ic:"◈",lb:"Dashboard"},{id:"lotes",ic:"⬡",lb:"Lotes"},{id:"caballos",ic:"⚘",lb:"Caballos"},{id:"rotaciones",ic:"↻",lb:"Rot. Cultivos"},{id:"parametros",ic:"⚙",lb:"Info Modificable"},{id:"movimientos",ic:"⇄",lb:"Movimientos"},{id:"bajas",ic:"↓",lb:"Bajas"}];
 
   if(!user) return(
     <div style={{minHeight:"100vh",background:"#f5f5f0",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
@@ -2272,6 +2272,42 @@ export default function HarasApp(){
                   }
                 </div>
               </div>
+            </>
+          )}
+
+          {/* BAJAS */}
+          {view==="bajas"&&(
+            <>
+              <div className="mh"><div><h2>Bajas</h2><p>{caballos.filter(c=>c.baja).length} animales dados de baja</p></div></div>
+              {caballos.filter(c=>c.baja).length===0
+                ?<div className="card"><div className="es">Sin bajas registradas.</div></div>
+                :<div className="card">
+                  <table className="table">
+                    <thead><tr><th>Nombre</th><th>Categoría</th><th>Fecha baja</th><th>Último lote</th><th>Acciones</th></tr></thead>
+                    <tbody>{caballos.filter(c=>c.baja).sort((a,b)=>(b.fechaBaja||"").localeCompare(a.fechaBaja||"")).map(c=>{
+                      const ultimoMov=[...movimientos.filter(m=>m.caballoId===c.id&&m.tipo==="baja")].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+                      return(
+                        <tr key={c.id}>
+                          <td style={{fontWeight:700}}>{c.nombre}</td>
+                          <td><span className="badge">{c.categoria}</span></td>
+                          <td>{c.fechaBaja?fmt(c.fechaBaja):"—"}</td>
+                          <td>{ultimoMov?.loteOrigen?lotes.find(l=>l.id===ultimoMov.loteOrigen)?.nombre||ultimoMov.loteOrigen:"—"}</td>
+                          <td>
+                            <div className="fb g2p">
+                              <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Historial</button>
+                              <button className="btn bg sm" onClick={()=>{
+                                setCaballos(prev=>prev.map(x=>x.id===c.id?{...x,baja:false,fechaBaja:null}:x));
+                                sbUpsert("caballos",[{id:c.id,baja:false,fecha_baja:null}]);
+                                showToast("✓ Baja revertida");
+                              }}>↩ Revertir</button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}</tbody>
+                  </table>
+                </div>
+              }
             </>
           )}
 
