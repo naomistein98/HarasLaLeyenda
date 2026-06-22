@@ -1022,6 +1022,7 @@ export default function HarasApp(){
   const [filtroLoteTipo,setFiltroLoteTipo]=useState(""); // filter lotes by cultivo type
   const [confirmAction,setConfirmAction]=useState(null); // {mensaje, onConfirm}
   const [showTrasladoLote,setShowTrasladoLote]=useState(null); // loteId origen
+  const [showBajaModal,setShowBajaModal]=useState(null); // caballoId
   const [showMoverCaballo,setShowMoverCaballo]=useState(null); // {caballoId, loteOrigen}
   const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
@@ -1302,7 +1303,7 @@ export default function HarasApp(){
   const [fLl,setFLl]=useState(ELl);
   const [fR,setFR]=useState(ER);
 
-  const cabsDe=(lid)=>caballos.filter(c=>c.loteId===lid);
+  const cabsDe=(lid)=>caballos.filter(c=>c.loteId===lid&&!c.baja);
 
   // Stock total: last known tot from STOCK_HISTORIAL, else named horses
   const stockTotal=(lid)=>{
@@ -1367,13 +1368,14 @@ export default function HarasApp(){
     return null;
   };
 
+  const caballosActivos=useMemo(()=>caballos.filter(c=>!c.baja),[caballos]);
   const caballosFiltrados=useMemo(()=>{
-    return caballos.filter(c=>{
+    return caballosActivos.filter(c=>{
       const matchCat = !filtroCat || c.categoria===filtroCat;
       const matchNombre = !filtroCabNombre || c.nombre.toLowerCase().includes(filtroCabNombre.toLowerCase());
       return matchCat && matchNombre;
     });
-  },[caballos,filtroCat,filtroCabNombre]);
+  },[caballosActivos,filtroCat,filtroCabNombre]);
 
   const lotesFiltrados=useMemo(()=>{
     return lotes.filter(l=>{
@@ -1546,6 +1548,25 @@ export default function HarasApp(){
       lote_origen:newMov.loteOrigen||null, lote_destino:newMov.loteDestino||null,
       motivo:newMov.motivo||null, notas:newMov.notas||null,
     }]);
+  }
+
+  function darDeBaja(caballoId, fecha, motivo){
+    const cab=caballos.find(c=>c.id===caballoId);
+    if(!cab) return;
+    // Save movement as baja
+    saveMovimiento({
+      fecha, tipo:"baja",
+      caballoId:cab.id, caballoNombre:cab.nombre,
+      cantidad:1, categoria:cab.categoria,
+      loteOrigen:cab.loteId||null, loteDestino:null,
+      motivo:motivo||"Baja del haras", notas:"",
+    });
+    // Mark caballo as baja
+    setCaballos(prev=>prev.map(c=>c.id===caballoId?{...c,loteId:null,baja:true,fechaBaja:fecha}:c));
+    saveCaballoToDb({...cab,lote_id:null,baja:true,fecha_baja:fecha});
+    // Update in Supabase
+    sbUpsert("caballos",[{id:caballoId,lote_id:null,baja:true,fecha_baja:fecha}]);
+    showToast(`✓ ${cab.nombre} dado de baja`);
   }
 
   function trasladarLoteCompleto(loteOrigenId, loteDestinoId, fecha, motivo){
@@ -2202,6 +2223,7 @@ export default function HarasApp(){
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
                                 <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Movimientos</button>
                                 <button className="btn bg sm" style={{color:"#2d5a00",borderColor:"#a0d080"}} onClick={()=>setShowPesoModal(c.id)}>⚖️ Peso</button>
+                                <button className="btn bg sm" style={{color:"#cc2222",borderColor:"#e0a0a0"}} onClick={()=>setShowBajaModal(c.id)}>↓ Dar de baja</button>
                                 <button className="btn bd2 sm" onClick={()=>setConfirmAction({mensaje:`Vas a eliminar a "${c.nombre}" del sistema. Esta acción se puede deshacer.`,onConfirm:()=>delCab(c.id)})}>✕ Eliminar</button>
                               </div></td>
                             </tr>
@@ -2498,6 +2520,39 @@ export default function HarasApp(){
             </div>
           </div>
         )}
+        {/* MODAL: Dar de baja */}
+        {showBajaModal&&(()=>{
+          const cab=caballos.find(c=>c.id===showBajaModal);
+          if(!cab) return null;
+          return(
+            <div className="mo" onClick={e=>e.target===e.currentTarget&&setShowBajaModal(null)}>
+              <div className="md" style={{maxWidth:400}}>
+                <div className="mtit">↓ Dar de baja — {cab.nombre}</div>
+                <div style={{fontSize:13,color:"#555",marginBottom:16}}>
+                  El animal ya no va a aparecer en los lotes ni en el conteo activo. Quedará registrado en la sección <strong>Bajas</strong> con todo su historial.
+                </div>
+                <div className="fg">
+                  <label className="fl">Fecha de baja</label>
+                  <input className="fi" type="date" id="bajaFecha" defaultValue={hoy()}/>
+                </div>
+                <div className="fg">
+                  <label className="fl">Motivo</label>
+                  <input className="fi" id="bajaMotivo" placeholder="Ej: Venta, muerte, traslado definitivo..."/>
+                </div>
+                <div className="fb g2p" style={{justifyContent:"space-between",marginTop:16}}>
+                  <button className="btn bg" onClick={()=>setShowBajaModal(null)}>Cancelar</button>
+                  <button className="btn bp" style={{background:"#cc2222",border:"none"}} onClick={()=>{
+                    const fecha=document.getElementById("bajaFecha").value||hoy();
+                    const motivo=document.getElementById("bajaMotivo").value;
+                    darDeBaja(showBajaModal, fecha, motivo);
+                    setShowBajaModal(null);
+                  }}>↓ Confirmar baja</button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* MODAL: Trasladar lote completo */}
         {showTrasladoLote&&(()=>{
           const loteOrig=lotes.find(l=>l.id===showTrasladoLote);
