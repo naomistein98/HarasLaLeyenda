@@ -1370,6 +1370,7 @@ export default function HarasApp(){
   };
 
   const caballosActivos=useMemo(()=>caballos.filter(c=>!c.baja),[caballos]);
+  const getPesosOrdenados=(caballoId)=>[...pesoHistorial.filter(p=>p.caballoId===caballoId)].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
   const caballosFiltrados=useMemo(()=>{
     return caballosActivos.filter(c=>{
       const matchCat = !filtroCat || c.categoria===filtroCat;
@@ -2680,7 +2681,7 @@ export default function HarasApp(){
         {showPesoModal&&(()=>{
           const cab=caballos.find(c=>c.id===showPesoModal);
           if(!cab) return null;
-          const histPesos=[...pesoHistorial.filter(p=>p.caballoId===showPesoModal)].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
+          const histPesos=getPesosOrdenados(showPesoModal);
           // If horse has peso but no historial, show it as initial entry
           const pesosConInicial = histPesos.length===0 && cab.peso ? 
             [{id:"init",caballoId:cab.id,fecha:cab.fechaIngreso||"",peso:cab.peso,esInicial:true}] : 
