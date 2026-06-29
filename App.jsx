@@ -1023,6 +1023,7 @@ export default function HarasApp(){
   const [confirmAction,setConfirmAction]=useState(null); // {mensaje, onConfirm}
   const [showTrasladoLote,setShowTrasladoLote]=useState(null); // loteId origen
   const [showBajaModal,setShowBajaModal]=useState(null); // caballoId
+  const [editPesoId,setEditPesoId]=useState(null); // peso id being edited
   const [showMoverCaballo,setShowMoverCaballo]=useState(null); // {caballoId, loteOrigen}
   const [newPesoFecha,setNewPesoFecha]=useState("");
   const [consumoDetalle,setConsumoDetalle]=useState(CONSUMO_DETALLE_INIT);         // historial de cambios
@@ -2723,7 +2724,24 @@ export default function HarasApp(){
                       }
                       return(
                         <tr key={p.id}>
-                          <td>{p.fecha?fmt(p.fecha):<span style={{color:"#aaa"}}>Sin fecha</span>}</td>
+                          <td>
+                            {editPesoId===p.id
+                              ?<input type="date" defaultValue={p.fecha} style={{fontSize:12,padding:"2px 4px",border:"1px solid #ccc",borderRadius:4}}
+                                onBlur={e=>{
+                                  const newFecha=e.target.value;
+                                  if(newFecha&&newFecha!==p.fecha){
+                                    setPesoHistorial(prev=>prev.map(x=>x.id===p.id?{...x,fecha:newFecha}:x));
+                                    sbUpsert("peso_historial",[{id:p.id,caballo_id:p.caballoId,fecha:newFecha,peso:p.peso}]);
+                                    showToast("✓ Fecha actualizada");
+                                  }
+                                  setEditPesoId(null);
+                                }}
+                                autoFocus/>
+                              :<span style={{cursor:"pointer",textDecoration:"underline dotted"}} onClick={()=>!p.esInicial&&setEditPesoId(p.id)}>
+                                {p.fecha?fmt(p.fecha):<span style={{color:"#aaa"}}>Sin fecha</span>}
+                              </span>
+                            }
+                          </td>
                           <td style={{fontWeight:700,color:"#2d5a00"}}>{p.peso} kg {p.esInicial&&<span style={{fontSize:10,color:"#888"}}>(inicial)</span>}</td>
                           <td>
                             {variacion!==null
