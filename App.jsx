@@ -69,6 +69,7 @@ async function sbUpsert(table, data) {
   const result = await sbFetch(table, "POST", data, "?on_conflict=id");
   return result !== null ? result : null;
 }
+async function sbUpdate(table, id, data) { return await sbFetch(table, "PATCH", data, `?id=eq.${id}`); }
 async function sbDelete(table, id) { return await sbFetch(table, "DELETE", null, `?id=eq.${id}`); }
 
 
@@ -2732,7 +2733,7 @@ export default function HarasApp(){
                                   const newFecha=e.target.value;
                                   if(newFecha&&newFecha!==p.fecha){
                                     setPesoHistorial(prev=>prev.map(x=>x.id===p.id?{...x,fecha:newFecha}:x));
-                                    sbUpsert("peso_historial",[{id:p.id,caballo_id:p.caballoId,fecha:newFecha,peso:p.peso}]);
+                                    sbUpdate("peso_historial",p.id,{fecha:newFecha});
                                     showToast("✓ Fecha actualizada");
                                   }
                                   setEditPesoId(null);
