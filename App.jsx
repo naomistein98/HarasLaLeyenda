@@ -2711,10 +2711,8 @@ export default function HarasApp(){
                 {pesosConInicial.length===0
                   ?<div className="tm txs">Sin registros previos</div>
                   :<table className="table">
-                    <thead><tr><th>Fecha</th><th>Peso</th><th>Var. diaria</th></tr></thead>
+                    <thead><tr><th>Fecha</th><th>Peso</th><th>Var. diaria</th><th></th></tr></thead>
                     <tbody>{pesosConInicial.map((p,idx)=>{
-                      // pesosConInicial is sorted desc (most recent first)
-                      // compare with the PREVIOUS one chronologically = next in this array
                       const anterior = pesosConInicial[idx+1];
                       let variacion = null;
                       if(anterior && p.fecha && anterior.fecha && p.fecha!==anterior.fecha){
@@ -2734,6 +2732,13 @@ export default function HarasApp(){
                               </span>
                               :<span style={{color:"#aaa",fontSize:12}}>—</span>
                             }
+                          </td>
+                          <td>
+                            {!p.esInicial&&<button onClick={()=>{
+                              setPesoHistorial(prev=>prev.filter(x=>x.id!==p.id));
+                              sbDelete("peso_historial",p.id);
+                              showToast("✓ Pesaje eliminado");
+                            }} style={{background:"none",border:"none",color:"#cc2222",cursor:"pointer",fontSize:14,fontWeight:700}}>✕</button>}
                           </td>
                         </tr>
                       );
