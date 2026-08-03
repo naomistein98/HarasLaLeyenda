@@ -1218,7 +1218,8 @@ export default function HarasApp(){
             id: c.id, nombre: c.nombre, categoria: c.categoria,
             alimentos: c.alimentos || [], loteId: c.lote_id,
             fechaIngreso: c.fecha_ingreso || "", peso: c.peso || "",
-            color: c.color || "",
+            color: c.color || "", criasAlPie: c.crias_al_pie || 0,
+            baja: c.baja || false, fechaBaja: c.fecha_baja || null,
           }));
           // Keep initCaballos entries that aren't in DB yet (seed data)
           setCaballos(prev=>{
@@ -1551,6 +1552,15 @@ export default function HarasApp(){
       lote_origen:newMov.loteOrigen||null, lote_destino:newMov.loteDestino||null,
       motivo:newMov.motivo||null, notas:newMov.notas||null,
     }]);
+  }
+
+  function updateCriasAlPie(caballoId, delta){
+    setCaballos(prev=>prev.map(c=>{
+      if(c.id!==caballoId) return c;
+      const newCrias = Math.max(0, (c.criasAlPie||0) + delta);
+      sbUpdate("caballos", caballoId, {crias_al_pie: newCrias});
+      return {...c, criasAlPie: newCrias};
+    }));
   }
 
   function darDeBaja(caballoId, fecha, motivo){
@@ -2010,7 +2020,14 @@ export default function HarasApp(){
                                  <div key={h.id} className="hc">
                                    <span style={{fontSize:20}}>🐴</span>
                                    <div style={{flex:1}}>
-                                     <div style={{color:"#1a1410",fontWeight:500}}>{h.nombre}</div>
+                                     <div style={{color:"#1a1410",fontWeight:500}}>
+                                       {h.nombre}
+                                       {h.categoria==="Yegua madre"&&(h.criasAlPie||0)>0&&
+                                         <span style={{marginLeft:6,background:"#e8f5e8",color:"#2d5a00",borderRadius:10,padding:"1px 7px",fontSize:11,fontWeight:700}}>
+                                           +{h.criasAlPie} cría{h.criasAlPie>1?"s":""}
+                                         </span>
+                                       }
+                                     </div>
                                      <div className="tm txs">{h.categoria}{h.fechaIngreso?` · ${diasDesde(h.fechaIngreso)} días aquí`:""}</div>
                                    </div>
                                    <button className="btn bg sm" style={{marginRight:8}} onClick={()=>setShowMoverCaballo({caballoId:h.id, loteOrigen:l.id})}>⇄ Mover</button>
@@ -2226,6 +2243,14 @@ export default function HarasApp(){
                                 <button className="btn bg sm" onClick={()=>editCab(c)}>Editar</button>
                                 <button className="btn bg sm" onClick={()=>{setModal("histCaballo");setEditId(c.id);}}>Movimientos</button>
                                 <button className="btn bg sm" style={{color:"#2d5a00",borderColor:"#a0d080"}} onClick={()=>setShowPesoModal(c.id)}>⚖️ Peso</button>
+                                {c.categoria==="Yegua madre"&&(
+                                  <div style={{display:"inline-flex",alignItems:"center",gap:4,border:"1px solid #a0d080",borderRadius:8,padding:"2px 6px",background:"#f0faf0"}}>
+                                    <button onClick={()=>updateCriasAlPie(c.id,-1)} style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:14,padding:"0 2px"}} disabled={(c.criasAlPie||0)===0}>−</button>
+                                    <span style={{fontSize:12,fontWeight:700,color:"#2d5a00",minWidth:12,textAlign:"center"}}>{c.criasAlPie||0}</span>
+                                    <button onClick={()=>updateCriasAlPie(c.id,1)} style={{background:"none",border:"none",cursor:"pointer",color:"#2d5a00",fontWeight:700,fontSize:14,padding:"0 2px"}}>+</button>
+                                    <span style={{fontSize:10,color:"#2d5a00"}}>🐴</span>
+                                  </div>
+                                )}
                                 <button className="btn bg sm" style={{color:"#cc2222",borderColor:"#e0a0a0"}} onClick={()=>setShowBajaModal(c.id)}>↓ Dar de baja</button>
                                 <button className="btn bd2 sm" onClick={()=>setConfirmAction({mensaje:`Vas a eliminar a "${c.nombre}" del sistema. Esta acción se puede deshacer.`,onConfirm:()=>delCab(c.id)})}>✕ Eliminar</button>
                               </div></td>
