@@ -330,15 +330,33 @@ export default function HarasApp() {
           {!loading && view === "buscar" && (
             <div className="search-hero">
               <h2>¿Qué caballo buscás?</h2>
-              <div className="search-bar">
-                <input
-                  value={busqueda}
-                  onChange={e => setBusqueda(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && buscar()}
-                  placeholder="Nombre del caballo..."
-                  autoFocus
-                />
-                <button onClick={buscar}>Buscar</button>
+              <div className="search-bar" style={{position:"relative"}}>
+                <div style={{position:"relative",flex:1}}>
+                  <input
+                    value={busqueda}
+                    onChange={e => { setBusqueda(e.target.value); setBusquedaActiva(""); }}
+                    onKeyDown={e => { if(e.key==="Enter") buscar(); if(e.key==="Escape") setBusqueda(""); }}
+                    placeholder="Nombre del caballo..."
+                    autoFocus
+                    style={{width:"100%",padding:"16px 20px",fontSize:16,border:"2px solid #c9a84c",borderRight:"none",borderRadius:"12px 0 0 12px",outline:"none",background:"#fff"}}
+                  />
+                  {busqueda.length>1 && !busquedaActiva && (()=>{
+                    const sugs = caballos.filter(c=>c.nombre?.toLowerCase().includes(busqueda.toLowerCase())).slice(0,8);
+                    if(!sugs.length) return null;
+                    return(
+                      <div style={{position:"absolute",top:"100%",left:0,right:0,background:"#fff",border:"1px solid #e0ddd8",borderTop:"none",borderRadius:"0 0 12px 12px",boxShadow:"0 4px 12px rgba(0,0,0,.1)",zIndex:100,maxHeight:300,overflowY:"auto"}}>
+                        {sugs.map(c=>(
+                          <div key={c.id} style={{padding:"10px 16px",cursor:"pointer",borderBottom:"1px solid #f5f3ef",display:"flex",justifyContent:"space-between",alignItems:"center"}}
+                            onMouseDown={()=>{ setBusqueda(c.nombre); setBusquedaActiva(c.nombre); setSelCaballo(c); }}>
+                            <span style={{fontWeight:600,fontSize:14}}>{c.nombre}</span>
+                            <span style={{fontSize:12,color:"#888"}}>{c.categoria} {c.loteId ? "· "+getLoteNombre(c.loteId):""}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+                <button onClick={buscar} style={{padding:"16px 24px",background:"#c9a84c",color:"#fff",border:"none",borderRadius:"0 12px 12px 0",fontSize:16,cursor:"pointer",fontWeight:600}}>Buscar</button>
               </div>
 
               {busquedaActiva && (
